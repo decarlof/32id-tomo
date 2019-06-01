@@ -72,7 +72,7 @@ def get_calculated_num_projections(variableDict):
         print('  *** ***   *** *** Error getting fly calculated number of projections!')
         calc_num_proj = global_PVs['Fly_Calc_Projections'].get()
     if calc_num_proj != int(variableDict['Projections']):
-        print('  *** ***  *** *** Updating number of projections from: %d to %d' % variableDict['Projections'], calc_num_proj)
+        print('  *** ***  *** *** Updating number of projections from: %d to %d' % (variableDict['Projections'], calc_num_proj))
         variableDict['Projections'] = int(calc_num_proj)
     # print('Num projections = ',int(variableDict['Projections']), ' fly calc triggers = ', calc_num_proj)
     print('  *** *** Number of projections: %d' % int(variableDict['Projections']))
