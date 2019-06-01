@@ -328,8 +328,10 @@ def init_general_PVs(global_PVs, variableDict):
 
 
 def stop_scan(global_PVs, variableDict):
-	print('YEP!!!!')
-	print('Stop scan called!')
+	# print('YEP!!!!')
+	# print('Stop scan called!')
+    print(' ')
+    print('  *** Stop scan')
 	global_PVs['Motor_SampleRot_Stop'].put(1)
 	global_PVs['TIFF1_AutoSave'].put('No')
 	global_PVs['TIFF1_Capture'].put(0)
@@ -339,6 +341,7 @@ def stop_scan(global_PVs, variableDict):
 	reset_CCD(global_PVs, variableDict)
 	disable_fast_shutter(global_PVs, variableDict)
 	enable_smaract(global_PVs, variableDict)
+    print('  *** Stop scan: Done!')
 
 
 def reset_CCD(global_PVs, variableDict):
@@ -376,7 +379,7 @@ def setup_detector(global_PVs, variableDict):
 	print(' ')
 	print('  *** setup_detector')
 	if variableDict.has_key('Display_live'):
-		print '** disable live display'
+		print('  *** *** disable live display')
 		global_PVs['Cam1_Display'].put( int( variableDict['Display_live'] ) )
 	global_PVs['Cam1_ImageMode'].put('Multiple')
 	global_PVs['Cam1_ArrayCallbacks'].put('Enable')
@@ -406,7 +409,9 @@ def setup_detector(global_PVs, variableDict):
 
 
 def setup_writer(global_PVs, variableDict, filename=None):
-	print 'setup_writer()'
+	# print 'setup_writer()'
+    print('  ')
+    print('  *** setup hdf_writer')
 	global_PVs['HDF1_LazyOpen'].put(0)
 	if variableDict.has_key('Recursive_Filter_Enabled'):
 		if variableDict['Recursive_Filter_Enabled'] == 1:
@@ -441,11 +446,12 @@ def setup_writer(global_PVs, variableDict, filename=None):
 		global_PVs['HDF1_FileName'].put(filename)
 	global_PVs['HDF1_Capture'].put(1)
 	wait_pv(global_PVs['HDF1_Capture'], 1)
+    print('  *** setup hdf_writer: Done!')
 
 
 def setup_tiff_writer(global_PVs, variableDict, filename=None):
 	print('  ')
-	print('  *** setup_writer')
+	print('  *** setup_tiff_writer')
 	global_PVs['TIFF1_ArrayPort'].put(variableDict['TIFFNDArrayPort'], wait=True)
 	if variableDict.has_key('Recursive_Filter_Enabled'):
 		if variableDict['Recursive_Filter_Enabled'] == 1:
@@ -477,10 +483,10 @@ def setup_tiff_writer(global_PVs, variableDict, filename=None):
 		global_PVs['TIFF1_FileName'].put(filename)
 	global_PVs['TIFF1_Capture'].put(1)
 	wait_pv(global_PVs['TIFF1_Capture'], 1)
-	print('  *** setup_writer: Done!')
+	print('  *** setup_tiff_writer: Done!')
 
 def capture_multiple_projections(global_PVs, variableDict, num_proj, frame_type):
-	print('capture_multiple_projections(', num_proj, ')')
+	print('      *** capture_multiple_projections(', num_proj, ')')
 	wait_time_sec = int(variableDict['ExposureTime']) + 5
 	global_PVs['Cam1_ImageMode'].put('Multiple')
 	global_PVs['Cam1_FrameType'].put(frame_type)
@@ -499,6 +505,7 @@ def capture_multiple_projections(global_PVs, variableDict, num_proj, frame_type)
 		global_PVs['Cam1_NumImages'].put(int(num_proj))
 		global_PVs['Cam1_Acquire'].put(DetectorAcquire, wait=True)
 		wait_pv(global_PVs['Cam1_Acquire'], DetectorIdle, wait_time_sec)
+    print('      *** capture_multiple_projections: Done!')
 
 
 def move_sample_in(global_PVs, variableDict):
@@ -508,7 +515,7 @@ def move_sample_in(global_PVs, variableDict):
 #	global_PVs['Motor_SampleX'].put(float(variableDict['SampleXIn']), wait=True)
 	global_PVs['Motor_Sample_Top_X'].put(float(variableDict['SampleXIn']), wait=True)
 	if False == wait_pv(global_PVs['Motor_Sample_Top_X_RBV'], float(variableDict['SampleXIn']), 60):
-		print('Motor_Sample_Top_X did not move in properly')
+		print('  *** *** Motor_Sample_Top_X did not move in properly')
 		print(global_PVs['Motor_Sample_Top_X_STATUS'].get())
 		print(global_PVs['Motor_Sample_Top_X_MIP'].get())
 		print(global_PVs['Motor_Sample_Top_X_RETRY'].get())
@@ -521,14 +528,16 @@ def move_sample_in(global_PVs, variableDict):
 
 
 def move_sample_out(global_PVs, variableDict):
-	print 'move_sample_out()'
+	# print 'move_sample_out()'
+    print(' ')
+    print('  *** move_sample_out')
 #	global_PVs['Motor_SampleRot'].put(float(variableDict['SampleRotOut']), wait=True)
 #	global_PVs['Motor_X_Tile'].put(float(variableDict['SampleXOut']), wait=True)
 #	global_PVs['Motor_SampleX'].put(float(variableDict['SampleXOut']), wait=True)
 	global_PVs['Motor_Sample_Top_X'].put(float(variableDict['SampleXOut']), wait=True)
 	#global_PVs['Motor_SampleRot'].put(float(variableDict['SampleRotOut']), wait=True)
 	if False == wait_pv(global_PVs['Motor_Sample_Top_X_RBV'], float(variableDict['SampleXOut']), 60):
-	    print('Motor_Sample_Top_X did not move out properly')
+	    print('  *** *** Motor_Sample_Top_X did not move out properly')
 	    print(global_PVs['Motor_Sample_Top_X_STATUS'].get())
 	    print(global_PVs['Motor_Sample_Top_X_MIP'].get())
 	    print(global_PVs['Motor_Sample_Top_X_RETRY'].get())
@@ -553,14 +562,16 @@ def open_shutters(global_PVs, variableDict):
 
 
 def close_shutters(global_PVs, variableDict):
-	print('close_shutters()')
+	# print('close_shutters()')
+    print(' ')
+    print('  *** close_shutters')
 	if UseShutterA > 0:
 		global_PVs['ShutterA_Close'].put(1, wait=True)
 		wait_pv(global_PVs['ShutterA_Move_Status'], ShutterA_Close_Value)
 	if UseShutterB > 0:
 		global_PVs['ShutterB_Close'].put(1, wait=True)
 		wait_pv(global_PVs['ShutterB_Move_Status'], ShutterB_Close_Value)
-
+    print('  *** close_shutter: Done!')
 
 def enable_fast_shutter(global_PVs, variableDict, rotation_trigger=False, delay=0.02):
     """Enable the hardware-triggered fast shutter.
@@ -684,23 +695,29 @@ def auto_focus_microCT(global_PVs, variableDict, rscan_range, nSteps, ScanMotorN
 
 
 def disable_smaract(global_PVs, variableDict):
+    print('      *** Disabling the Smaract')
     global_PVs['zone_plate_x_StopAndGo'].put(0, wait=True)
     global_PVs['zone_plate_y_StopAndGo'].put(0, wait=True)
     global_PVs['zone_plate_z_StopAndGo'].put(0, wait=True)
     global_PVs['Motor_Sample_Top_X_StopAndGo'].put(0, wait=True) # 3=Go, 2=Move, 1=Pause, 0=Stop
     global_PVs['Motor_Sample_Top_Z_StopAndGo'].put(0, wait=True)
+    print('      *** Disabling the Smaract: Done!')
     
     
 def enable_smaract(global_PVs, variableDict):
+    print('      *** Re-enabling the Smaract')
     global_PVs['zone_plate_x_StopAndGo'].put(3, wait=True)
     global_PVs['zone_plate_y_StopAndGo'].put(3, wait=True)
     global_PVs['zone_plate_z_StopAndGo'].put(3, wait=True)
     global_PVs['Motor_Sample_Top_X_StopAndGo'].put(3, wait=True) # 3=Go, 2=Move, 1=Pause, 0=Stop
     global_PVs['Motor_Sample_Top_Z_StopAndGo'].put(3, wait=True)
+    print('      *** Re-enabling the Smaract: Done!')
     
 
 def add_theta(global_PVs, variableDict, theta_arr):
-	print('add_theta()')
+	# print('add_theta()')
+    print(' ')
+    print('  *** add_theta')
 	fullname = global_PVs['HDF1_FullFileName_RBV'].get(as_string=True)
 	try:
 		hdf_f = h5py.File(fullname, mode='a')
@@ -708,12 +725,16 @@ def add_theta(global_PVs, variableDict, theta_arr):
 			theta_ds = hdf_f.create_dataset('/exchange/theta', (len(theta_arr),))
 			theta_ds[:] = theta_arr[:]
 		hdf_f.close()
+        print('  *** add_theta: Done!')
 	except:
 		traceback.print_exc(file=sys.stdout)
+        print('  *** add_theta: Failed accessing:', fullname)
 
 
 def add_interfero_hdf5(global_PVs, variableDict, interf_zpx_arrs, interf_zpy_arrs, det_trig_pulses_arrs):
-	print('add_interfero_hdf5()')
+	# print('add_interfero_hdf5()')
+    print(' ')
+    print('  *** add_interfero_hdf5')
 	wait_pv(global_PVs['HDF1_Capture_RBV'], 0, 10.0)
 	fullname = global_PVs['HDF1_FullFileName_RBV'].get(as_string=True)
 	try:
@@ -729,8 +750,12 @@ def add_interfero_hdf5(global_PVs, variableDict, interf_zpx_arrs, interf_zpy_arr
 #			if len(interf_arrs[i]) == len(interf_arrs[0]):
 #				interf_ds[i,:] = interf_arrs[i][:]
 		hdf_f.close()
+        print('  *** add_interfero_hdf5: Done')
+
 	except:
 		traceback.print_exc(file=sys.stdout)
+        print('  *** add_interfero_hdf5: Failed accessing:', fullname)
+
 
 
 def move_dataset_to_run_dir(global_PVs, variableDict):
