@@ -486,7 +486,7 @@ def setup_tiff_writer(global_PVs, variableDict, filename=None):
     print('  *** setup_tiff_writer: Done!')
 
 def capture_multiple_projections(global_PVs, variableDict, num_proj, frame_type):
-    print('      *** capture_multiple_projections(', num_proj, ')')
+    print('      *** capture_multiple_projections %d ' % num_proj)
     wait_time_sec = int(variableDict['ExposureTime']) + 5
     global_PVs['Cam1_ImageMode'].put('Multiple')
     global_PVs['Cam1_FrameType'].put(frame_type)
