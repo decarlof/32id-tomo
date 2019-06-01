@@ -643,9 +643,9 @@ def disable_fast_shutter(global_PVs, variableDict):
 def auto_focus_microCT(global_PVs, variableDict, rscan_range, nSteps, ScanMotorName):
     print 'start auto focus scan...'
     init_general_PVs(global_PVs, variableDict)
-        if variableDict.has_key('StopTheScan'): # stopping the scan in a clean way
+    if variableDict.has_key('StopTheScan'): # stopping the scan in a clean way
         stop_scan(global_PVs, variableDict)
-        return
+    return
     setup_detector(global_PVs, variableDict)
     open_shutters(global_PVs, variableDict)
 
