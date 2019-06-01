@@ -55,7 +55,7 @@ def update_variable_dict(variableDict):
 
 #wait on a pv to be a value until max_timeout (default forever)
 def wait_pv(pv, wait_val, max_timeout_sec=-1):
-    print 'wait_pv(', pv.pvname, wait_val, max_timeout_sec, ')'
+    # print 'wait_pv(', pv.pvname, wait_val, max_timeout_sec, ')'
     #delay for pv to change
     time.sleep(.01)
     startTime = time.time()
