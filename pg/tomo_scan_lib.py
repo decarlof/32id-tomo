@@ -40,7 +40,7 @@ PG_Trigger_External_Trigger = 1 # Important for the Point Grey (continuous mode 
 Recursive_Filter_Type = 'RecursiveAve'
 
 if UseShutterA == 0 & UseShutterB ==0:
-    Logger(lfname).info('### WARNING: shutters are deactivted during the scans !!!!')
+    print('### WARNING: shutters are deactivted during the scans !!!!')
 
 
 LOG = logging.getLogger(__name__)
