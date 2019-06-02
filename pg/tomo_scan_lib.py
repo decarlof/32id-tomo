@@ -17,31 +17,27 @@ import signal
 import numpy
 import logging
 
+TESTING_MODE = True
+UseShutterA = False
+UseShutterB = True
+
 ShutterA_Open_Value = 0
 ShutterA_Close_Value = 1
 ShutterB_Open_Value = 0
 ShutterB_Close_Value = 1
+
 FrameTypeData = 0
 FrameTypeDark = 1
 FrameTypeWhite = 2
+
 DetectorIdle = 0
 DetectorAcquire = 1
-UseShutterA = 0
-UseShutterB = 1
-TXM = True # False or True
-EPSILON = 0.1
 
-TESTING_MODE = 1
-if TESTING_MODE:
-    UseShutterA = 0
-    UseShutterB = 0
+TXM = True
+EPSILON = 0.1
 
 PG_Trigger_External_Trigger = 1 # Important for the Point Grey (continuous mode as clock issues)
 Recursive_Filter_Type = 'RecursiveAve'
-
-if UseShutterA == 0 & UseShutterB ==0:
-    print('### WARNING: shutters are deactivted during the scans !!!!')
-
 
 LOG = logging.getLogger(__name__)
 
@@ -595,13 +591,16 @@ def move_sample_out(global_PVs, variableDict):
 def open_shutters(global_PVs, variableDict):
     Logger(variableDict['LogFileName']).info(' ')
     Logger(variableDict['LogFileName']).info('  *** open_shutters')
-    if UseShutterA > 0:
-        global_PVs['ShutterA_Open'].put(1, wait=True)
-        wait_pv(global_PVs['ShutterA_Move_Status'], ShutterA_Open_Value)
-        time.sleep(3)
-    if UseShutterB > 0:
-        global_PVs['ShutterB_Open'].put(1, wait=True)
-        wait_pv(global_PVs['ShutterB_Move_Status'], ShutterB_Open_Value)
+    if TESTING_MODE:
+        Logger(variableDict['LogFileName']).warning('  *** testing mode - shutters are deactivated during the scans !!!!')
+    else:
+        if UseShutterA:
+            global_PVs['ShutterA_Open'].put(1, wait=True)
+            wait_pv(global_PVs['ShutterA_Move_Status'], ShutterA_Open_Value)
+            time.sleep(3)
+        if UseShutterB:
+            global_PVs['ShutterB_Open'].put(1, wait=True)
+            wait_pv(global_PVs['ShutterB_Move_Status'], ShutterB_Open_Value)
     Logger(variableDict['LogFileName']).info('  *** open_shutters: Done!')
 
 
@@ -609,12 +608,15 @@ def close_shutters(global_PVs, variableDict):
     # Logger(variableDict['LogFileName']).info('close_shutters()')
     Logger(variableDict['LogFileName']).info(' ')
     Logger(variableDict['LogFileName']).info('  *** close_shutters')
-    if UseShutterA > 0:
-        global_PVs['ShutterA_Close'].put(1, wait=True)
-        wait_pv(global_PVs['ShutterA_Move_Status'], ShutterA_Close_Value)
-    if UseShutterB > 0:
-        global_PVs['ShutterB_Close'].put(1, wait=True)
-        wait_pv(global_PVs['ShutterB_Move_Status'], ShutterB_Close_Value)
+    if TESTING_MODE:
+        Logger(variableDict['LogFileName']).warning('  *** testing mode - shutters are deactivated during the scans !!!!')
+    else:    
+        if UseShutterA:
+            global_PVs['ShutterA_Close'].put(1, wait=True)
+            wait_pv(global_PVs['ShutterA_Move_Status'], ShutterA_Close_Value)
+        if UseShutterB:
+            global_PVs['ShutterB_Close'].put(1, wait=True)
+            wait_pv(global_PVs['ShutterB_Move_Status'], ShutterB_Close_Value)
     Logger(variableDict['LogFileName']).info('  *** close_shutter: Done!')
 
 def enable_fast_shutter(global_PVs, variableDict, rotation_trigger=False, delay=0.02):
