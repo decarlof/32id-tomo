@@ -121,7 +121,7 @@ def wait_pv(pv, wait_val, max_timeout_sec=-1):
 
 
 def init_general_PVs(global_PVs, variableDict):
-    Logger(lfname).info('init_PVs()')
+    # Logger(lfname).info('init_PVs()')
     #init detector pv's
     global_PVs['Cam1_ImageMode'] = PV(variableDict['IOC_Prefix'] + 'cam1:ImageMode') # 0=single, 1=multiple, 2=continuous
     global_PVs['Cam1_ArrayCallbacks'] = PV(variableDict['IOC_Prefix'] + 'cam1:ArrayCallbacks')
