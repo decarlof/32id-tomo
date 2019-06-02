@@ -42,7 +42,8 @@ variableDict = {'PreDarkImages': 5,
         'FileWriteMode': 'Stream',
         'UseInterferometer': 0,
         'nLoops': 1,
-        'CCD_Readout': 0.05
+        'CCD_Readout': 0.05,
+        'LogFileName': 'log.log'
         }
 
 
