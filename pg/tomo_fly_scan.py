@@ -11,6 +11,8 @@ import shutil
 import os
 import imp
 import traceback
+import logging
+from datetime import datetime
 
 from tomo_scan_lib import *
 
@@ -45,6 +47,10 @@ variableDict = {'PreDarkImages': 5,
 
 
 global_PVs = {}
+
+lfname = 'logs/' + datetime.strftime(datetime.now(), "%Y-%m-%d_%H:%M:%S") + '.log'
+LOG, fHandler = setup_logger(lfname)
+variableDict['LogFileName'] = lfname
 
 #def getVariableDict():
 #   return variableDict

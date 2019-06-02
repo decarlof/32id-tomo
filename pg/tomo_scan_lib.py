@@ -15,6 +15,7 @@ import traceback
 import math
 import signal
 import numpy
+import logging
 
 ShutterA_Open_Value = 0
 ShutterA_Close_Value = 1
@@ -42,15 +43,58 @@ if UseShutterA == 0 & UseShutterB ==0:
     print('### WARNING: shutters are deactivted during the scans !!!!')
 
 
+LOG = logging.getLogger(__name__)
+
+
+class Logger(object):
+    __GREEN = "\033[92m"
+    __RED = '\033[91m'
+    __YELLOW = '\033[33m'
+    __ENDC = '\033[0m'
+
+    def __init__(self, name):
+        self.logger = logging.getLogger(name)
+        self.extra={'logger_name': name, 'endColor': self.__ENDC, 'color': self.__GREEN}
+
+    def info(self, msg):
+        self.extra['color'] = self.__GREEN
+        self.logger.info(msg, extra=self.extra)
+
+    def error(self, msg):
+        self.extra['color'] = self.__RED
+        self.logger.error(msg, extra=self.extra)
+
+    def warning(self, msg):
+        self.extra['color'] = self.__YELLOW
+        self.logger.warning(msg, extra=self.extra)
+
+
+def setup_logger(log_name, stream_to_console=True):
+    logger = logging.getLogger(log_name)
+    fHandler = logging.FileHandler(log_name)
+    logger.setLevel(logging.DEBUG)
+    formatter = logging.Formatter("%(asctime)s %(color)s  %(message)s %(endColor)s")
+    fHandler.setFormatter(formatter)
+    logger.addHandler(fHandler)
+    if stream_to_console:
+        ch = logging.StreamHandler()
+        formatter = logging.Formatter("%(asctime)s %(color)s  %(message)s %(endColor)s")
+        ch.setFormatter(formatter)
+        # ch.setLevel(logging.WARNING)
+        logger.addHandler(ch)
+    
+    return logger, fHandler
+
+
 def update_variable_dict(variableDict):
     argDic = {}
     if len(sys.argv) > 1:
         strArgv = sys.argv[1]
         argDic = json.loads(strArgv)
-    print 'orig variable dict', variableDict
+    print('orig variable dict', variableDict)
     for k,v in argDic.iteritems():
         variableDict[k] = v
-    print 'new variable dict', variableDict
+    print('new variable dict', variableDict)
 
 
 #wait on a pv to be a value until max_timeout (default forever)
@@ -77,7 +121,7 @@ def wait_pv(pv, wait_val, max_timeout_sec=-1):
 
 
 def init_general_PVs(global_PVs, variableDict):
-    print 'init_PVs()'
+    print('init_PVs()')
     #init detector pv's
     global_PVs['Cam1_ImageMode'] = PV(variableDict['IOC_Prefix'] + 'cam1:ImageMode') # 0=single, 1=multiple, 2=continuous
     global_PVs['Cam1_ArrayCallbacks'] = PV(variableDict['IOC_Prefix'] + 'cam1:ArrayCallbacks')
@@ -641,7 +685,7 @@ def disable_fast_shutter(global_PVs, variableDict):
 
 
 def auto_focus_microCT(global_PVs, variableDict, rscan_range, nSteps, ScanMotorName):
-    print 'start auto focus scan...'
+    print('start auto focus scan...')
     init_general_PVs(global_PVs, variableDict)
     if variableDict.has_key('StopTheScan'): # stopping the scan in a clean way
         stop_scan(global_PVs, variableDict)
@@ -667,7 +711,7 @@ def auto_focus_microCT(global_PVs, variableDict, rscan_range, nSteps, ScanMotorN
     
     cnt = 0
     for sample_pos in vector_pos:
-        print('  '); print('  ### Motor position:', sample_pos); print('  ')
+        print('  *** *** Motor position:', sample_pos)
         global_PVs[Motor_Name].put(sample_pos, wait=True)
         time.sleep(0.25)
 
@@ -680,14 +724,14 @@ def auto_focus_microCT(global_PVs, variableDict, rscan_range, nSteps, ScanMotorN
         img_vect = global_PVs['Cam1_Image'].get(count=image_size)
         #img = np.reshape(img_vect,[nRow, nCol])
         vector_std[cnt] = numpy.std(img_vect)
-        print(' --> Standard deviation: ', str(vector_std[cnt]))
+        print('  *** *** Standard deviation: ', str(vector_std[cnt]))
         cnt = cnt + 1
 
     # move the lens to the focal position:
     max_std = numpy.max(vector_std)
     focal_pos = vector_pos[numpy.where(vector_std == max_std)]
-    print(' *** Highest standard deviation: ', str(max_std))
-    print(' *** Move piezo to ', str(focal_pos))
+    print('  *** *** Highest standard deviation: ', str(max_std))
+    print('  *** *** Move piezo to ', str(focal_pos))
     global_PVs[Motor_Name].put(focal_pos, wait=True)
 
     close_shutters(global_PVs, variableDict)
