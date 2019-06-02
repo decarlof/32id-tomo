@@ -91,10 +91,10 @@ def update_variable_dict(variableDict):
     if len(sys.argv) > 1:
         strArgv = sys.argv[1]
         argDic = json.loads(strArgv)
-    Logger(lfname).info('orig variable dict', variableDict)
+    # Logger(lfname).info('orig variable dict', variableDict)
     for k,v in argDic.iteritems():
         variableDict[k] = v
-    Logger(lfname).info('new variable dict', variableDict)
+    # Logger(lfname).info('new variable dict', variableDict)
 
 
 #wait on a pv to be a value until max_timeout (default forever)
