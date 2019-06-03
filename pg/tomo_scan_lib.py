@@ -87,10 +87,10 @@ def update_variable_dict(variableDict):
     if len(sys.argv) > 1:
         strArgv = sys.argv[1]
         argDic = json.loads(strArgv)
-    # Logger(variableDict['LogFileName']).info('orig variable dict', variableDict)
+    # print('orig variable dict', variableDict)
     for k,v in argDic.iteritems():
         variableDict[k] = v
-    # Logger(variableDict['LogFileName']).info('new variable dict', variableDict)
+    # print('new variable dict', variableDict)
 
 
 #wait on a pv to be a value until max_timeout (default forever)
@@ -117,7 +117,7 @@ def wait_pv(pv, wait_val, max_timeout_sec=-1):
 
 
 def init_general_PVs(global_PVs, variableDict):
-    # Logger(variableDict['LogFileName']).info('init_PVs()')
+    # print('init_PVs()')
     #init detector pv's
     global_PVs['Cam1_ImageMode'] = PV(variableDict['IOC_Prefix'] + 'cam1:ImageMode') # 0=single, 1=multiple, 2=continuous
     global_PVs['Cam1_ArrayCallbacks'] = PV(variableDict['IOC_Prefix'] + 'cam1:ArrayCallbacks')
@@ -368,8 +368,8 @@ def init_general_PVs(global_PVs, variableDict):
 
 
 def stop_scan(global_PVs, variableDict):
-    # Logger(variableDict['LogFileName']).info('YEP!!!!')
-    # Logger(variableDict['LogFileName']).info('Stop scan called!')
+    # print('YEP!!!!')
+    # print('Stop scan called!')
     Logger(variableDict['LogFileName']).info(' ')
     Logger(variableDict['LogFileName']).info('  *** Stop scan')
     global_PVs['Motor_SampleRot_Stop'].put(1)
@@ -605,7 +605,7 @@ def open_shutters(global_PVs, variableDict):
 
 
 def close_shutters(global_PVs, variableDict):
-    # Logger(variableDict['LogFileName']).info('close_shutters()')
+    # print('close_shutters()')
     Logger(variableDict['LogFileName']).info(' ')
     Logger(variableDict['LogFileName']).info('  *** close_shutters')
     if TESTING_MODE:
@@ -761,7 +761,7 @@ def enable_smaract(global_PVs, variableDict):
     
 
 def add_theta(global_PVs, variableDict, theta_arr):
-    # Logger(variableDict['LogFileName']).info('add_theta()')
+    # print('add_theta()')
     Logger(variableDict['LogFileName']).info(' ')
     Logger(variableDict['LogFileName']).info('  *** add_theta')
     fullname = global_PVs['HDF1_FullFileName_RBV'].get(as_string=True)
@@ -778,7 +778,7 @@ def add_theta(global_PVs, variableDict, theta_arr):
 
 
 def add_interfero_hdf5(global_PVs, variableDict, interf_zpx_arrs, interf_zpy_arrs, det_trig_pulses_arrs):
-    # Logger(variableDict['LogFileName']).info('add_interfero_hdf5()')
+    # print('add_interfero_hdf5()')
     Logger(variableDict['LogFileName']).info(' ')
     Logger(variableDict['LogFileName']).info('  *** add_interfero_hdf5')
     wait_pv(global_PVs['HDF1_Capture_RBV'], 0, 10.0)
