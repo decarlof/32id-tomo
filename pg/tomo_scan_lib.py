@@ -550,8 +550,7 @@ def capture_multiple_projections(global_PVs, variableDict, num_proj, frame_type)
 
 
 def move_sample_in(global_PVs, variableDict):
-    Logger(variableDict['LogFileName']).info(' ')
-    Logger(variableDict['LogFileName']).info('  *** move_sample_in')
+    Logger(variableDict['LogFileName']).info('       *** move_sample_in')
 #   global_PVs['Motor_X_Tile'].put(float(variableDict['SampleXIn']), wait=True)
 #   global_PVs['Motor_SampleX'].put(float(variableDict['SampleXIn']), wait=True)
     global_PVs['Motor_Sample_Top_X'].put(float(variableDict['SampleXIn']), wait=True)
@@ -565,20 +564,19 @@ def move_sample_in(global_PVs, variableDict):
 #   global_PVs['Motor_SampleY'].put(float(variableDict['SampleYIn']), wait=True)
 #   global_PVs['Motor_SampleZ'].put(float(variableDict['SampleZIn']), wait=True)
 #   global_PVs['Motor_SampleRot'].put(0, wait=True)
-    Logger(variableDict['LogFileName']).info('  *** move_sample_in: Done!')
+    Logger(variableDict['LogFileName']).info('       *** move_sample_in: Done!')
 
 
 def move_sample_out(global_PVs, variableDict):
     # print 'move_sample_out()'
-    Logger(variableDict['LogFileName']).info(' ')
-    Logger(variableDict['LogFileName']).info('  *** move_sample_out')
+    Logger(variableDict['LogFileName']).info('       *** move_sample_out')
 #   global_PVs['Motor_SampleRot'].put(float(variableDict['SampleRotOut']), wait=True)
 #   global_PVs['Motor_X_Tile'].put(float(variableDict['SampleXOut']), wait=True)
 #   global_PVs['Motor_SampleX'].put(float(variableDict['SampleXOut']), wait=True)
     global_PVs['Motor_Sample_Top_X'].put(float(variableDict['SampleXOut']), wait=True)
     #global_PVs['Motor_SampleRot'].put(float(variableDict['SampleRotOut']), wait=True)
     if False == wait_pv(global_PVs['Motor_Sample_Top_X_RBV'], float(variableDict['SampleXOut']), 60):
-        Logger(variableDict['LogFileName']).info('  *** *** Motor_Sample_Top_X did not move out properly')
+        Logger(variableDict['LogFileName']).error('       *** Motor_Sample_Top_X did not move out properly')
         print(global_PVs['Motor_Sample_Top_X_STATUS'].get())
         print(global_PVs['Motor_Sample_Top_X_MIP'].get())
         print(global_PVs['Motor_Sample_Top_X_RETRY'].get())
@@ -587,10 +585,9 @@ def move_sample_out(global_PVs, variableDict):
 #   global_PVs['Motor_SampleY'].put(float(variableDict['SampleYOut']), wait=True)
 #   global_PVs['Motor_SampleZ'].put(float(variableDict['SampleZOut']), wait=True)
 #   global_PVs['Motor_SampleRot'].put(0, wait=True)
-    Logger(variableDict['LogFileName']).info('  *** move_sample_out: Done!')
+    Logger(variableDict['LogFileName']).info('       *** move_sample_out: Done!')
 
 def open_shutters(global_PVs, variableDict):
-    Logger(variableDict['LogFileName']).info(' ')
     Logger(variableDict['LogFileName']).info('       ***  open_shutters')
     if TESTING_MODE:
         Logger(variableDict['LogFileName']).warning('       ***  testing mode - shutters are deactivated during the scans !!!!')
