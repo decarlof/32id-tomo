@@ -527,7 +527,7 @@ def setup_tiff_writer(global_PVs, variableDict, filename=None):
 
 def capture_multiple_projections(global_PVs, variableDict, num_proj, frame_type):
     Logger(variableDict['LogFileName']).info(' ')
-    Logger(variableDict['LogFileName']).info('  ***  ***  capture_multiple_projections %d ' % num_proj)
+    Logger(variableDict['LogFileName']).info('       ***  capture_multiple_projections %d ' % num_proj)
     wait_time_sec = int(variableDict['ExposureTime']) + 5
     global_PVs['Cam1_ImageMode'].put('Multiple')
     global_PVs['Cam1_FrameType'].put(frame_type)
@@ -546,7 +546,7 @@ def capture_multiple_projections(global_PVs, variableDict, num_proj, frame_type)
         global_PVs['Cam1_NumImages'].put(int(num_proj))
         global_PVs['Cam1_Acquire'].put(DetectorAcquire, wait=True)
         wait_pv(global_PVs['Cam1_Acquire'], DetectorIdle, wait_time_sec)
-    Logger(variableDict['LogFileName']).info('  ***  ***  capture_multiple_projections: Done!')
+    Logger(variableDict['LogFileName']).info('       ***  capture_multiple_projections: Done!')
 
 
 def move_sample_in(global_PVs, variableDict):
@@ -591,9 +591,9 @@ def move_sample_out(global_PVs, variableDict):
 
 def open_shutters(global_PVs, variableDict):
     Logger(variableDict['LogFileName']).info(' ')
-    Logger(variableDict['LogFileName']).info('  ***  ***  pen_shutters')
+    Logger(variableDict['LogFileName']).info('       ***  open_shutters')
     if TESTING_MODE:
-        Logger(variableDict['LogFileName']).warning('  ***  ***  testing mode - shutters are deactivated during the scans !!!!')
+        Logger(variableDict['LogFileName']).warning('       ***  testing mode - shutters are deactivated during the scans !!!!')
     else:
         if UseShutterA:
             global_PVs['ShutterA_Open'].put(1, wait=True)
@@ -602,14 +602,14 @@ def open_shutters(global_PVs, variableDict):
         if UseShutterB:
             global_PVs['ShutterB_Open'].put(1, wait=True)
             wait_pv(global_PVs['ShutterB_Move_Status'], ShutterB_Open_Value)
-    Logger(variableDict['LogFileName']).info('  ***  ***  open_shutters: Done!')
+    Logger(variableDict['LogFileName']).info('       ***  open_shutters: Done!')
 
 
 def close_shutters(global_PVs, variableDict):
     # print('close_shutters()')
-    Logger(variableDict['LogFileName']).info('  ***  ***  close_shutters')
+    Logger(variableDict['LogFileName']).info('       ***  close_shutters')
     if TESTING_MODE:
-        Logger(variableDict['LogFileName']).warning('  ***  ***  testing mode - shutters are deactivated during the scans !!!!')
+        Logger(variableDict['LogFileName']).warning('       ***  testing mode - shutters are deactivated during the scans !!!!')
     else:    
         if UseShutterA:
             global_PVs['ShutterA_Close'].put(1, wait=True)
@@ -617,7 +617,7 @@ def close_shutters(global_PVs, variableDict):
         if UseShutterB:
             global_PVs['ShutterB_Close'].put(1, wait=True)
             wait_pv(global_PVs['ShutterB_Move_Status'], ShutterB_Close_Value)
-    Logger(variableDict['LogFileName']).info('  *** close_shutter: Done!')
+    Logger(variableDict['LogFileName']).info('       *** close_shutter: Done!')
 
 def enable_fast_shutter(global_PVs, variableDict, rotation_trigger=False, delay=0.02):
     """Enable the hardware-triggered fast shutter.
