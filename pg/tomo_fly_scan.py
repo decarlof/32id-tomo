@@ -173,10 +173,12 @@ def start_scan(variableDict, global_PVs, detector_filename):
         global_PVs['Cam1_AcquireTime'].put(float(variableDict['ExposureTime']) )
         Logger(lfname).info('  *** Pre White Fields: Done!')
     
+    Logger(lfname).info('  *** Setting for fly scan')
     move_sample_in(global_PVs, variableDict)
     #time.sleep(float(variableDict['StabilizeSleep_ms']) / 1000.0)
     open_shutters(global_PVs, variableDict)
     disable_smaract(global_PVs, variableDict)
+    Logger(lfname).info('  *** Setting for fly scan: Done!')
 
     # run fly scan
     theta = fly_scan(variableDict)
@@ -199,6 +201,8 @@ def start_scan(variableDict, global_PVs, detector_filename):
         time.sleep(2)
         capture_multiple_projections(global_PVs, variableDict, int(variableDict['PostDarkImages']), FrameTypeDark)
         Logger(lfname).info('  *** Post Dark Fields: Done!') 
+
+    Logger(lfname).info('  *** Finalizing scan') 
     close_shutters(global_PVs, variableDict)
     time.sleep(0.25)
     wait_pv(global_PVs['HDF1_Capture_RBV'], 0, 600)
@@ -212,6 +216,7 @@ def start_scan(variableDict, global_PVs, detector_filename):
     if False == wait_pv(global_PVs['HDF1_Capture'], 0, 10):
         global_PVs['HDF1_Capture'].put(0)
     reset_CCD(global_PVs, variableDict)
+    Logger(lfname).info('  *** Finalizing scan: Done!') 
 
 
 def main():

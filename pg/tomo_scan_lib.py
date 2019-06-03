@@ -739,29 +739,29 @@ def auto_focus_microCT(global_PVs, variableDict, rscan_range, nSteps, ScanMotorN
 
 
 def disable_smaract(global_PVs, variableDict):
-    Logger(variableDict['LogFileName']).info('      *** Disabling the Smaract')
+    Logger(variableDict['LogFileName']).info('       ***  disabling the Smaract')
     global_PVs['zone_plate_x_StopAndGo'].put(0, wait=True)
     global_PVs['zone_plate_y_StopAndGo'].put(0, wait=True)
     global_PVs['zone_plate_z_StopAndGo'].put(0, wait=True)
     global_PVs['Motor_Sample_Top_X_StopAndGo'].put(0, wait=True) # 3=Go, 2=Move, 1=Pause, 0=Stop
     global_PVs['Motor_Sample_Top_Z_StopAndGo'].put(0, wait=True)
-    Logger(variableDict['LogFileName']).info('      *** Disabling the Smaract: Done!')
+    Logger(variableDict['LogFileName']).info('       ***  disabling the Smaract: Done!')
     
     
 def enable_smaract(global_PVs, variableDict):
-    Logger(variableDict['LogFileName']).info('      *** Re-enabling the Smaract')
+    Logger(variableDict['LogFileName']).info('       ***  re-enabling the Smaract')
     global_PVs['zone_plate_x_StopAndGo'].put(3, wait=True)
     global_PVs['zone_plate_y_StopAndGo'].put(3, wait=True)
     global_PVs['zone_plate_z_StopAndGo'].put(3, wait=True)
     global_PVs['Motor_Sample_Top_X_StopAndGo'].put(3, wait=True) # 3=Go, 2=Move, 1=Pause, 0=Stop
     global_PVs['Motor_Sample_Top_Z_StopAndGo'].put(3, wait=True)
-    Logger(variableDict['LogFileName']).info('      *** Re-enabling the Smaract: Done!')
+    Logger(variableDict['LogFileName']).info('       ***  re-enabling the Smaract: Done!')
     
 
 def add_theta(global_PVs, variableDict, theta_arr):
     # print('add_theta()')
     Logger(variableDict['LogFileName']).info(' ')
-    Logger(variableDict['LogFileName']).info('  *** add_theta')
+    Logger(variableDict['LogFileName']).info('       ***  add_theta')
     fullname = global_PVs['HDF1_FullFileName_RBV'].get(as_string=True)
     try:
         hdf_f = h5py.File(fullname, mode='a')
@@ -769,20 +769,20 @@ def add_theta(global_PVs, variableDict, theta_arr):
             theta_ds = hdf_f.create_dataset('/exchange/theta', (len(theta_arr),))
             theta_ds[:] = theta_arr[:]
         hdf_f.close()
-        Logger(variableDict['LogFileName']).info('  *** add_theta: Done!')
+        Logger(variableDict['LogFileName']).info('       ***  add_theta: Done!')
     except:
         traceback.print_exc(file=sys.stdout)
-        Logger(variableDict['LogFileName']).info('  *** add_theta: Failed accessing:', fullname)
+        Logger(variableDict['LogFileName']).error('       ***  add_theta: Failed accessing:', fullname)
 
 
 def add_interfero_hdf5(global_PVs, variableDict, interf_zpx_arrs, interf_zpy_arrs, det_trig_pulses_arrs):
     # print('add_interfero_hdf5()')
     Logger(variableDict['LogFileName']).info(' ')
-    Logger(variableDict['LogFileName']).info('  *** add_interfero_hdf5')
+    Logger(variableDict['LogFileName']).info('       ***  add_interfero_hdf5')
     wait_pv(global_PVs['HDF1_Capture_RBV'], 0, 10.0)
     fullname = global_PVs['HDF1_FullFileName_RBV'].get(as_string=True)
     try:
-        Logger(variableDict['LogFileName']).info('Opening hdf5 file ',fullname)
+        Logger(variableDict['LogFileName']).info('       ***  opening hdf5 file', fullname)
         hdf_f = h5py.File(fullname, mode='a')
         interf_zpx_ds = hdf_f.create_dataset('/measurement/instrument/interferometer/interfero_zpx_arrs', (len(interf_zpx_arrs),), dtype='f' )
         interf_zpx_ds[:] = interf_zpx_arrs[:]
@@ -794,11 +794,11 @@ def add_interfero_hdf5(global_PVs, variableDict, interf_zpx_arrs, interf_zpy_arr
 #           if len(interf_arrs[i]) == len(interf_arrs[0]):
 #               interf_ds[i,:] = interf_arrs[i][:]
         hdf_f.close()
-        Logger(variableDict['LogFileName']).info('  *** add_interfero_hdf5: Done')
+        Logger(variableDict['LogFileName']).info('       ***  add_interfero_hdf5: Done')
 
     except:
         traceback.print_exc(file=sys.stdout)
-        Logger(variableDict['LogFileName']).info('  *** add_interfero_hdf5: Failed accessing:', fullname)
+        Logger(variableDict['LogFileName']).error('       ***  add_interfero_hdf5: Failed accessing:', fullname)
 
 
 
@@ -812,7 +812,7 @@ def move_dataset_to_run_dir(global_PVs, variableDict):
         run_full_path = run_dir + '/' + base_name
         shutil.move(full_path, run_full_path)
     except:
-        Logger(variableDict['LogFileName']).info('error moving dataset to run directory')
+        Logger(variableDict['LogFileName']).error('error moving dataset to run directory')
     
 
 ########################## Interlaced #########################
