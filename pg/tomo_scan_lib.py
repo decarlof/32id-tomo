@@ -550,7 +550,7 @@ def capture_multiple_projections(global_PVs, variableDict, num_proj, frame_type)
 
 
 def move_sample_in(global_PVs, variableDict):
-    Logger(variableDict['LogFileName']).info(' ')
+    # Logger(variableDict['LogFileName']).info(' ')
     Logger(variableDict['LogFileName']).info('       ***  move_sample_in')
 #   global_PVs['Motor_X_Tile'].put(float(variableDict['SampleXIn']), wait=True)
 #   global_PVs['Motor_SampleX'].put(float(variableDict['SampleXIn']), wait=True)
@@ -760,7 +760,7 @@ def enable_smaract(global_PVs, variableDict):
 
 def add_theta(global_PVs, variableDict, theta_arr):
     # print('add_theta()')
-    Logger(variableDict['LogFileName']).info(' ')
+    # Logger(variableDict['LogFileName']).info(' ')
     Logger(variableDict['LogFileName']).info('       ***  add_theta')
     fullname = global_PVs['HDF1_FullFileName_RBV'].get(as_string=True)
     try:

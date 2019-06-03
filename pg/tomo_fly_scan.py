@@ -172,7 +172,8 @@ def start_scan(variableDict, global_PVs, detector_filename):
         capture_multiple_projections(global_PVs, variableDict, int(variableDict['PreWhiteImages']), FrameTypeWhite)
         global_PVs['Cam1_AcquireTime'].put(float(variableDict['ExposureTime']) )
         Logger(lfname).info('  *** Pre White Fields: Done!')
-    
+
+    Logger(lfname).info(' ')
     Logger(lfname).info('  *** Setting for fly scan')
     move_sample_in(global_PVs, variableDict)
     #time.sleep(float(variableDict['StabilizeSleep_ms']) / 1000.0)
@@ -202,6 +203,7 @@ def start_scan(variableDict, global_PVs, detector_filename):
         capture_multiple_projections(global_PVs, variableDict, int(variableDict['PostDarkImages']), FrameTypeDark)
         Logger(lfname).info('  *** Post Dark Fields: Done!') 
 
+    Logger(lfname).info(' ')
     Logger(lfname).info('  *** Finalizing scan') 
     close_shutters(global_PVs, variableDict)
     time.sleep(0.25)
