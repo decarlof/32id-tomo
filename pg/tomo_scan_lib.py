@@ -46,6 +46,8 @@ __RED = '\033[91m'
 __YELLOW = '\033[33m'
 __ENDC = '\033[0m'
 
+logs_home = '/home/beams/USR32IDC/logs/'
+
 logger = None
 info_extra={'endColor': __ENDC, 'color': __GREEN}
 warn_extra={'endColor': __ENDC, 'color': __YELLOW}
@@ -92,7 +94,7 @@ def setup_logger(log_name, stream_to_console=True):
         logger.addHandler(ch)
 
 # create logger
-lfname = 'logs/' + datetime.strftime(datetime.now(), "%Y-%m-%d_%H:%M:%S") + '.log'
+lfname = logs_home + datetime.strftime(datetime.now(), "%Y-%m-%d_%H:%M:%S") + '.log'
 setup_logger(lfname)
 
 def update_variable_dict(variableDict):
