@@ -68,7 +68,7 @@ def get_calculated_num_projections(variableDict):
     global_PVs['Fly_ScanDelta'].put(delta, wait=True)
     time.sleep(3.0)
     calc_num_proj = global_PVs['Fly_Calc_Projections'].get()
-    info(lfname,'  *** *** calculated number of projections: %f' % calc_num_proj)
+    info('  *** *** calculated number of projections: %f' % calc_num_proj)
     if calc_num_proj == None:
         error('  *** *** Error getting fly calculated number of projections!')
         calc_num_proj = global_PVs['Fly_Calc_Projections'].get()
