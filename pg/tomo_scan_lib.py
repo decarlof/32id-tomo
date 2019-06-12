@@ -539,7 +539,6 @@ def setup_tiff_writer(global_PVs, variableDict, filename=None):
     info('  *** setup_tiff_writer: Done!')
 
 def capture_multiple_projections(global_PVs, variableDict, num_proj, frame_type):
-    # info(' ')
     info('       ***  capture_multiple_projections %d ' % num_proj)
     wait_time_sec = int(variableDict['ExposureTime']) + 5
     global_PVs['Cam1_ImageMode'].put('Multiple')
@@ -563,7 +562,6 @@ def capture_multiple_projections(global_PVs, variableDict, num_proj, frame_type)
 
 
 def move_sample_in(global_PVs, variableDict):
-    # info(' ')
     info('       ***  move_sample_in')
 #   global_PVs['Motor_X_Tile'].put(float(variableDict['SampleXIn']), wait=True)
 #   global_PVs['Motor_SampleX'].put(float(variableDict['SampleXIn']), wait=True)
@@ -573,7 +571,6 @@ def move_sample_in(global_PVs, variableDict):
         print(global_PVs['Motor_Sample_Top_X_STATUS'].get())
         print(global_PVs['Motor_Sample_Top_X_MIP'].get())
         print(global_PVs['Motor_Sample_Top_X_RETRY'].get())
-        info('\r\n\r\n')
 #   global_PVs['Motor_Sample_Top_Z'].put(float(variableDict['SampleZIn']), wait=True)
 #   global_PVs['Motor_SampleY'].put(float(variableDict['SampleYIn']), wait=True)
 #   global_PVs['Motor_SampleZ'].put(float(variableDict['SampleZIn']), wait=True)
@@ -594,7 +591,6 @@ def move_sample_out(global_PVs, variableDict):
         print(global_PVs['Motor_Sample_Top_X_STATUS'].get())
         print(global_PVs['Motor_Sample_Top_X_MIP'].get())
         print(global_PVs['Motor_Sample_Top_X_RETRY'].get())
-        info('\r\n\r\n')
 #   global_PVs['Motor_Sample_Top_Z'].put(float(variableDict['SampleZOut']), wait=True)
 #   global_PVs['Motor_SampleY'].put(float(variableDict['SampleYOut']), wait=True)
 #   global_PVs['Motor_SampleZ'].put(float(variableDict['SampleZOut']), wait=True)
@@ -698,7 +694,7 @@ def disable_fast_shutter(global_PVs, variableDict):
 
 
 def auto_focus_microCT(global_PVs, variableDict, rscan_range, nSteps, ScanMotorName):
-    info('start auto focus scan...')
+    info('  ***  start auto focus scan...')
     init_general_PVs(global_PVs, variableDict)
     if variableDict.has_key('StopTheScan'): # stopping the scan in a clean way
         stop_scan(global_PVs, variableDict)
@@ -712,7 +708,7 @@ def auto_focus_microCT(global_PVs, variableDict, rscan_range, nSteps, ScanMotorN
     image_size = nRow * nCol
 
     Motor_Name = ScanMotorName
-    info('*** Scanning ' + Motor_Name)
+    info('       ***  Scanning %s ' % Motor_Name)
 
     Motor_Start_Pos = global_PVs[Motor_Name].get() - rscan_range/2
     Motor_End_Pos = global_PVs[Motor_Name].get() + rscan_range/2
@@ -724,7 +720,7 @@ def auto_focus_microCT(global_PVs, variableDict, rscan_range, nSteps, ScanMotorN
     
     cnt = 0
     for sample_pos in vector_pos:
-        info('  *** *** Motor position:', sample_pos)
+        info('       *** *** Motor position: %f' % sample_pos)
         global_PVs[Motor_Name].put(sample_pos, wait=True)
         time.sleep(0.25)
 
@@ -737,14 +733,14 @@ def auto_focus_microCT(global_PVs, variableDict, rscan_range, nSteps, ScanMotorN
         img_vect = global_PVs['Cam1_Image'].get(count=image_size)
         #img = np.reshape(img_vect,[nRow, nCol])
         vector_std[cnt] = numpy.std(img_vect)
-        info('  *** *** Standard deviation: ', str(vector_std[cnt]))
+        info('       *** *** Standard deviation: %s ' % str(vector_std[cnt]))
         cnt = cnt + 1
 
     # move the lens to the focal position:
     max_std = numpy.max(vector_std)
     focal_pos = vector_pos[numpy.where(vector_std == max_std)]
-    info('  *** *** Highest standard deviation: ', str(max_std))
-    info('  *** *** Move piezo to ', str(focal_pos))
+    info('  *** *** Highest standard deviation: %s ' % str(max_std))
+    info('  *** *** Move piezo to %s ' % str(focal_pos))
     global_PVs[Motor_Name].put(focal_pos, wait=True)
 
     close_shutters(global_PVs, variableDict)
@@ -773,12 +769,11 @@ def enable_smaract(global_PVs, variableDict):
 
 def add_theta(global_PVs, variableDict, theta_arr):
     # print('add_theta()')
-    # info(' ')
     info('       ***  add_theta')
     fullname = global_PVs['HDF1_FullFileName_RBV'].get(as_string=True)
     try:
         hdf_f = h5py.File(fullname, mode='a')
-        if theta_arr != None:
+        if theta_arr is not None:
             theta_ds = hdf_f.create_dataset('/exchange/theta', (len(theta_arr),))
             theta_ds[:] = theta_arr[:]
         hdf_f.close()
@@ -789,13 +784,12 @@ def add_theta(global_PVs, variableDict, theta_arr):
 
 
 def add_interfero_hdf5(global_PVs, variableDict, interf_zpx_arrs, interf_zpy_arrs, det_trig_pulses_arrs):
-    # print('add_interfero_hdf5()')
     info(' ')
     info('       ***  add_interfero_hdf5')
     wait_pv(global_PVs['HDF1_Capture_RBV'], 0, 10.0)
     fullname = global_PVs['HDF1_FullFileName_RBV'].get(as_string=True)
     try:
-        info('       ***  opening hdf5 file', fullname)
+        info('       ***  opening hdf5 file %s ' % fullname)
         hdf_f = h5py.File(fullname, mode='a')
         interf_zpx_ds = hdf_f.create_dataset('/measurement/instrument/interferometer/interfero_zpx_arrs', (len(interf_zpx_arrs),), dtype='f' )
         interf_zpx_ds[:] = interf_zpx_arrs[:]
@@ -811,12 +805,12 @@ def add_interfero_hdf5(global_PVs, variableDict, interf_zpx_arrs, interf_zpy_arr
 
     except:
         traceback.print_exc(file=sys.stdout)
-        error('       ***  add_interfero_hdf5: Failed accessing:', fullname)
+        error('       ***  add_interfero_hdf5: Failed accessing: %s' % fullname)
 
 
 
 def move_dataset_to_run_dir(global_PVs, variableDict):
-    info('move_dataset_to_run_dir()')
+    info('  ***  move_dataset_to_run_dir')
     try:
         txm_ui = imp.load_source('txm_ui', '/local/usr32idc/DMagic/doc/demo/txm_ui.py')
         run_dir = txm_ui.directory()
@@ -824,6 +818,7 @@ def move_dataset_to_run_dir(global_PVs, variableDict):
         base_name = os.path.basename(full_path)
         run_full_path = run_dir + '/' + base_name
         shutil.move(full_path, run_full_path)
+        info('  ***  move_dataset_to_run_dir: Done!')
     except:
         error('error moving dataset to run directory')
     
