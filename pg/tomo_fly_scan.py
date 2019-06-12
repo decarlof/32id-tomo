@@ -216,6 +216,7 @@ def start_scan(variableDict, global_PVs, detector_filename):
     if False == wait_pv(global_PVs['HDF1_Capture'], 0, 10):
         global_PVs['HDF1_Capture'].put(0)
     reset_CCD(global_PVs, variableDict)
+    scp(global_PVs, variableDict)
     info('  *** Finalizing scan: Done!') 
 
 
