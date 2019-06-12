@@ -11,17 +11,20 @@ import shutil
 import os
 import imp
 import traceback
+import logging
+from datetime import datetime
 
 from tomo_scan_lib import *
+from dm_lib import *
 
 global variableDict
 
-variableDict = {'PreDarkImages': 5,
-        'PreWhiteImages': 10,
-        'Projections': 50,
-        'PostDarkImages': 2,
-        'PostWhiteImages': 5,
-        'SampleXOut': 0.1,
+variableDict = {'PreDarkImages': 0,
+        'PreWhiteImages': 0,
+        'Projections': 20,
+        'PostDarkImages': 0,
+        'PostWhiteImages': 0,
+        'SampleXOut': 0.0,
         'SampleYOut': 0.0,
         'SampleZOut': 0.0,
 #       'SampleRotOut': 0.0,
@@ -41,7 +44,8 @@ variableDict = {'PreDarkImages': 5,
         'UseInterferometer': 0,
         'nLoops': 1,
         'CCD_Readout': 0.05,
-        'LogFileName': 'log.log'
+        'RemoteAnalysisDir': 'usr32idc@txmtwo:/local/dataraid/'
+#        'LogFileName': 'log.log'
         }
 
 
