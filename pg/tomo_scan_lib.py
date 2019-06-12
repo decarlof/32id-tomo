@@ -16,6 +16,7 @@ import math
 import signal
 import numpy
 import logging
+from datetime import datetime
 
 TESTING_MODE = True
 UseShutterA = False
@@ -39,33 +40,45 @@ EPSILON = 0.1
 PG_Trigger_External_Trigger = 1 # Important for the Point Grey (continuous mode as clock issues)
 Recursive_Filter_Type = 'RecursiveAve'
 
-LOG = logging.getLogger(__name__)
+# Logging defines
+__GREEN = "\033[92m"
+__RED = '\033[91m'
+__YELLOW = '\033[33m'
+__ENDC = '\033[0m'
 
+logger = None
+info_extra={'endColor': __ENDC, 'color': __GREEN}
+warn_extra={'endColor': __ENDC, 'color': __YELLOW}
+error_extra={'endColor': __ENDC, 'color': __RED}
 
-class Logger(object):
-    __GREEN = "\033[92m"
-    __RED = '\033[91m'
-    __YELLOW = '\033[33m'
-    __ENDC = '\033[0m'
+def info(msg):
+    global logger
+    global info_extra
+    logger.info(msg, extra=info_extra)
 
-    def __init__(self, name):
-        self.logger = logging.getLogger(name)
-        self.extra={'logger_name': name, 'endColor': self.__ENDC, 'color': self.__GREEN}
+def error(msg):
+    global logger
+    global error_extra
+    logger.error(msg, extra=error_extra)
 
-    def info(self, msg):
-        self.extra['color'] = self.__GREEN
-        self.logger.info(msg, extra=self.extra)
-
-    def error(self, msg):
-        self.extra['color'] = self.__RED
-        self.logger.error(msg, extra=self.extra)
-
-    def warning(self, msg):
-        self.extra['color'] = self.__YELLOW
-        self.logger.warning(msg, extra=self.extra)
+def warning(msg):
+    global logger
+    global warn_extra
+    logger.warning(msg, extra=warn_extra)
 
 
 def setup_logger(log_name, stream_to_console=True):
+    global logger
+    global info_extra
+    global warn_extra
+    global error_extra
+
+    # make sure logs directory exists
+    if not os.path.exists("logs/"):
+        os.makedirs("logs/")
+    info_extra['logger_name'] = log_name
+    warn_extra['logger_name'] = log_name
+    error_extra['logger_name'] = log_name
     logger = logging.getLogger(log_name)
     fHandler = logging.FileHandler(log_name)
     logger.setLevel(logging.DEBUG)
@@ -74,13 +87,13 @@ def setup_logger(log_name, stream_to_console=True):
     logger.addHandler(fHandler)
     if stream_to_console:
         ch = logging.StreamHandler()
-        formatter = logging.Formatter("%(asctime)s %(color)s  %(message)s %(endColor)s")
         ch.setFormatter(formatter)
-        # ch.setLevel(logging.WARNING)
+        ch.setLevel(logging.DEBUG)
         logger.addHandler(ch)
-    
-    return logger, fHandler
 
+# create logger
+lfname = 'logs/' + datetime.strftime(datetime.now(), "%Y-%m-%d_%H:%M:%S") + '.log'
+setup_logger(lfname)
 
 def update_variable_dict(variableDict):
     argDic = {}
@@ -370,8 +383,8 @@ def init_general_PVs(global_PVs, variableDict):
 def stop_scan(global_PVs, variableDict):
     # print('YEP!!!!')
     # print('Stop scan called!')
-    Logger(variableDict['LogFileName']).info(' ')
-    Logger(variableDict['LogFileName']).info('  *** Stop scan')
+    info(' ')
+    info('  *** Stop scan')
     global_PVs['Motor_SampleRot_Stop'].put(1)
     global_PVs['TIFF1_AutoSave'].put('No')
     global_PVs['TIFF1_Capture'].put(0)
@@ -381,7 +394,7 @@ def stop_scan(global_PVs, variableDict):
     reset_CCD(global_PVs, variableDict)
     disable_fast_shutter(global_PVs, variableDict)
     enable_smaract(global_PVs, variableDict)
-    Logger(variableDict['LogFileName']).info('  *** Stop scan: Done!')
+    info('  *** Stop scan: Done!')
 
 
 def reset_CCD(global_PVs, variableDict):
@@ -416,10 +429,10 @@ def reset_CCD(global_PVs, variableDict):
 
 
 def setup_detector(global_PVs, variableDict):
-    Logger(variableDict['LogFileName']).info(' ')
-    Logger(variableDict['LogFileName']).info('  *** setup_detector')
+    info(' ')
+    info('  *** setup_detector')
     if variableDict.has_key('Display_live'):
-        Logger(variableDict['LogFileName']).info('  *** *** disable live display')
+        info('  *** *** disable live display')
         global_PVs['Cam1_Display'].put( int( variableDict['Display_live'] ) )
     global_PVs['Cam1_ImageMode'].put('Multiple')
     global_PVs['Cam1_ArrayCallbacks'].put('Enable')
@@ -445,13 +458,13 @@ def setup_detector(global_PVs, variableDict):
     else:
         global_PVs['Cam1_TriggerMode'].put('Internal')
     #global_PVs['ClearTheta'].put(1)
-    Logger(variableDict['LogFileName']).info('  *** setup_detector: Done!')
+    info('  *** setup_detector: Done!')
 
 
 def setup_writer(global_PVs, variableDict, filename=None):
     # print 'setup_writer()'
-    Logger(variableDict['LogFileName']).info('  ')
-    Logger(variableDict['LogFileName']).info('  *** setup hdf_writer')
+    info('  ')
+    info('  *** setup hdf_writer')
     global_PVs['HDF1_LazyOpen'].put(0)
     if variableDict.has_key('Recursive_Filter_Enabled'):
         if variableDict['Recursive_Filter_Enabled'] == 1:
@@ -486,12 +499,12 @@ def setup_writer(global_PVs, variableDict, filename=None):
         global_PVs['HDF1_FileName'].put(filename)
     global_PVs['HDF1_Capture'].put(1)
     wait_pv(global_PVs['HDF1_Capture'], 1)
-    Logger(variableDict['LogFileName']).info('  *** setup hdf_writer: Done!')
+    info('  *** setup hdf_writer: Done!')
 
 
 def setup_tiff_writer(global_PVs, variableDict, filename=None):
-    Logger(variableDict['LogFileName']).info('  ')
-    Logger(variableDict['LogFileName']).info('  *** setup_tiff_writer')
+    info('  ')
+    info('  *** setup_tiff_writer')
     global_PVs['TIFF1_ArrayPort'].put(variableDict['TIFFNDArrayPort'], wait=True)
     if variableDict.has_key('Recursive_Filter_Enabled'):
         if variableDict['Recursive_Filter_Enabled'] == 1:
@@ -523,11 +536,11 @@ def setup_tiff_writer(global_PVs, variableDict, filename=None):
         global_PVs['TIFF1_FileName'].put(filename)
     global_PVs['TIFF1_Capture'].put(1)
     wait_pv(global_PVs['TIFF1_Capture'], 1)
-    Logger(variableDict['LogFileName']).info('  *** setup_tiff_writer: Done!')
+    info('  *** setup_tiff_writer: Done!')
 
 def capture_multiple_projections(global_PVs, variableDict, num_proj, frame_type):
-    # Logger(variableDict['LogFileName']).info(' ')
-    Logger(variableDict['LogFileName']).info('       ***  capture_multiple_projections %d ' % num_proj)
+    # info(' ')
+    info('       ***  capture_multiple_projections %d ' % num_proj)
     wait_time_sec = int(variableDict['ExposureTime']) + 5
     global_PVs['Cam1_ImageMode'].put('Multiple')
     global_PVs['Cam1_FrameType'].put(frame_type)
@@ -546,52 +559,52 @@ def capture_multiple_projections(global_PVs, variableDict, num_proj, frame_type)
         global_PVs['Cam1_NumImages'].put(int(num_proj))
         global_PVs['Cam1_Acquire'].put(DetectorAcquire, wait=True)
         wait_pv(global_PVs['Cam1_Acquire'], DetectorIdle, wait_time_sec)
-    Logger(variableDict['LogFileName']).info('       ***  capture_multiple_projections: Done!')
+    info('       ***  capture_multiple_projections: Done!')
 
 
 def move_sample_in(global_PVs, variableDict):
-    # Logger(variableDict['LogFileName']).info(' ')
-    Logger(variableDict['LogFileName']).info('       ***  move_sample_in')
+    # info(' ')
+    info('       ***  move_sample_in')
 #   global_PVs['Motor_X_Tile'].put(float(variableDict['SampleXIn']), wait=True)
 #   global_PVs['Motor_SampleX'].put(float(variableDict['SampleXIn']), wait=True)
     global_PVs['Motor_Sample_Top_X'].put(float(variableDict['SampleXIn']), wait=True)
     if False == wait_pv(global_PVs['Motor_Sample_Top_X_RBV'], float(variableDict['SampleXIn']), 60):
-        Logger(variableDict['LogFileName']).error('       ***  Motor_Sample_Top_X did not move in properly')
+        error('       ***  Motor_Sample_Top_X did not move in properly')
         print(global_PVs['Motor_Sample_Top_X_STATUS'].get())
         print(global_PVs['Motor_Sample_Top_X_MIP'].get())
         print(global_PVs['Motor_Sample_Top_X_RETRY'].get())
-        Logger(variableDict['LogFileName']).info('\r\n\r\n')
+        info('\r\n\r\n')
 #   global_PVs['Motor_Sample_Top_Z'].put(float(variableDict['SampleZIn']), wait=True)
 #   global_PVs['Motor_SampleY'].put(float(variableDict['SampleYIn']), wait=True)
 #   global_PVs['Motor_SampleZ'].put(float(variableDict['SampleZIn']), wait=True)
 #   global_PVs['Motor_SampleRot'].put(0, wait=True)
-    Logger(variableDict['LogFileName']).info('       ***  move_sample_in: Done!')
+    info('       ***  move_sample_in: Done!')
 
 
 def move_sample_out(global_PVs, variableDict):
     # print 'move_sample_out()'
-    Logger(variableDict['LogFileName']).info('       ***  move_sample_out')
+    info('       ***  move_sample_out')
 #   global_PVs['Motor_SampleRot'].put(float(variableDict['SampleRotOut']), wait=True)
 #   global_PVs['Motor_X_Tile'].put(float(variableDict['SampleXOut']), wait=True)
 #   global_PVs['Motor_SampleX'].put(float(variableDict['SampleXOut']), wait=True)
     global_PVs['Motor_Sample_Top_X'].put(float(variableDict['SampleXOut']), wait=True)
     #global_PVs['Motor_SampleRot'].put(float(variableDict['SampleRotOut']), wait=True)
     if False == wait_pv(global_PVs['Motor_Sample_Top_X_RBV'], float(variableDict['SampleXOut']), 60):
-        Logger(variableDict['LogFileName']).error('       ***  Motor_Sample_Top_X did not move out properly')
+        error('       ***  Motor_Sample_Top_X did not move out properly')
         print(global_PVs['Motor_Sample_Top_X_STATUS'].get())
         print(global_PVs['Motor_Sample_Top_X_MIP'].get())
         print(global_PVs['Motor_Sample_Top_X_RETRY'].get())
-        Logger(variableDict['LogFileName']).info('\r\n\r\n')
+        info('\r\n\r\n')
 #   global_PVs['Motor_Sample_Top_Z'].put(float(variableDict['SampleZOut']), wait=True)
 #   global_PVs['Motor_SampleY'].put(float(variableDict['SampleYOut']), wait=True)
 #   global_PVs['Motor_SampleZ'].put(float(variableDict['SampleZOut']), wait=True)
 #   global_PVs['Motor_SampleRot'].put(0, wait=True)
-    Logger(variableDict['LogFileName']).info('       ***  move_sample_out: Done!')
+    info('       ***  move_sample_out: Done!')
 
 def open_shutters(global_PVs, variableDict):
-    Logger(variableDict['LogFileName']).info('       ***  open_shutters')
+    info('       ***  open_shutters')
     if TESTING_MODE:
-        Logger(variableDict['LogFileName']).warning('       ***  testing mode - shutters are deactivated during the scans !!!!')
+        warning('       ***  testing mode - shutters are deactivated during the scans !!!!')
     else:
         if UseShutterA:
             global_PVs['ShutterA_Open'].put(1, wait=True)
@@ -600,14 +613,14 @@ def open_shutters(global_PVs, variableDict):
         if UseShutterB:
             global_PVs['ShutterB_Open'].put(1, wait=True)
             wait_pv(global_PVs['ShutterB_Move_Status'], ShutterB_Open_Value)
-    Logger(variableDict['LogFileName']).info('       ***  open_shutters: Done!')
+    info('       ***  open_shutters: Done!')
 
 
 def close_shutters(global_PVs, variableDict):
     # print('close_shutters()')
-    Logger(variableDict['LogFileName']).info('       ***  close_shutters')
+    info('       ***  close_shutters')
     if TESTING_MODE:
-        Logger(variableDict['LogFileName']).warning('       ***  testing mode - shutters are deactivated during the scans !!!!')
+        warning('       ***  testing mode - shutters are deactivated during the scans !!!!')
     else:    
         if UseShutterA:
             global_PVs['ShutterA_Close'].put(1, wait=True)
@@ -615,7 +628,7 @@ def close_shutters(global_PVs, variableDict):
         if UseShutterB:
             global_PVs['ShutterB_Close'].put(1, wait=True)
             wait_pv(global_PVs['ShutterB_Move_Status'], ShutterB_Close_Value)
-    Logger(variableDict['LogFileName']).info('       ***  close_shutter: Done!')
+    info('       ***  close_shutter: Done!')
 
 def enable_fast_shutter(global_PVs, variableDict, rotation_trigger=False, delay=0.02):
     """Enable the hardware-triggered fast shutter.
@@ -685,7 +698,7 @@ def disable_fast_shutter(global_PVs, variableDict):
 
 
 def auto_focus_microCT(global_PVs, variableDict, rscan_range, nSteps, ScanMotorName):
-    Logger(variableDict['LogFileName']).info('start auto focus scan...')
+    info('start auto focus scan...')
     init_general_PVs(global_PVs, variableDict)
     if variableDict.has_key('StopTheScan'): # stopping the scan in a clean way
         stop_scan(global_PVs, variableDict)
@@ -699,7 +712,7 @@ def auto_focus_microCT(global_PVs, variableDict, rscan_range, nSteps, ScanMotorN
     image_size = nRow * nCol
 
     Motor_Name = ScanMotorName
-    Logger(variableDict['LogFileName']).info('*** Scanning ' + Motor_Name)
+    info('*** Scanning ' + Motor_Name)
 
     Motor_Start_Pos = global_PVs[Motor_Name].get() - rscan_range/2
     Motor_End_Pos = global_PVs[Motor_Name].get() + rscan_range/2
@@ -711,7 +724,7 @@ def auto_focus_microCT(global_PVs, variableDict, rscan_range, nSteps, ScanMotorN
     
     cnt = 0
     for sample_pos in vector_pos:
-        Logger(variableDict['LogFileName']).info('  *** *** Motor position:', sample_pos)
+        info('  *** *** Motor position:', sample_pos)
         global_PVs[Motor_Name].put(sample_pos, wait=True)
         time.sleep(0.25)
 
@@ -724,14 +737,14 @@ def auto_focus_microCT(global_PVs, variableDict, rscan_range, nSteps, ScanMotorN
         img_vect = global_PVs['Cam1_Image'].get(count=image_size)
         #img = np.reshape(img_vect,[nRow, nCol])
         vector_std[cnt] = numpy.std(img_vect)
-        Logger(variableDict['LogFileName']).info('  *** *** Standard deviation: ', str(vector_std[cnt]))
+        info('  *** *** Standard deviation: ', str(vector_std[cnt]))
         cnt = cnt + 1
 
     # move the lens to the focal position:
     max_std = numpy.max(vector_std)
     focal_pos = vector_pos[numpy.where(vector_std == max_std)]
-    Logger(variableDict['LogFileName']).info('  *** *** Highest standard deviation: ', str(max_std))
-    Logger(variableDict['LogFileName']).info('  *** *** Move piezo to ', str(focal_pos))
+    info('  *** *** Highest standard deviation: ', str(max_std))
+    info('  *** *** Move piezo to ', str(focal_pos))
     global_PVs[Motor_Name].put(focal_pos, wait=True)
 
     close_shutters(global_PVs, variableDict)
@@ -739,29 +752,29 @@ def auto_focus_microCT(global_PVs, variableDict, rscan_range, nSteps, ScanMotorN
 
 
 def disable_smaract(global_PVs, variableDict):
-    Logger(variableDict['LogFileName']).info('       ***  disabling the Smaract')
+    info('       ***  disabling the Smaract')
     global_PVs['zone_plate_x_StopAndGo'].put(0, wait=True)
     global_PVs['zone_plate_y_StopAndGo'].put(0, wait=True)
     global_PVs['zone_plate_z_StopAndGo'].put(0, wait=True)
     global_PVs['Motor_Sample_Top_X_StopAndGo'].put(0, wait=True) # 3=Go, 2=Move, 1=Pause, 0=Stop
     global_PVs['Motor_Sample_Top_Z_StopAndGo'].put(0, wait=True)
-    Logger(variableDict['LogFileName']).info('       ***  disabling the Smaract: Done!')
+    info('       ***  disabling the Smaract: Done!')
     
     
 def enable_smaract(global_PVs, variableDict):
-    Logger(variableDict['LogFileName']).info('       ***  re-enabling the Smaract')
+    info('       ***  re-enabling the Smaract')
     global_PVs['zone_plate_x_StopAndGo'].put(3, wait=True)
     global_PVs['zone_plate_y_StopAndGo'].put(3, wait=True)
     global_PVs['zone_plate_z_StopAndGo'].put(3, wait=True)
     global_PVs['Motor_Sample_Top_X_StopAndGo'].put(3, wait=True) # 3=Go, 2=Move, 1=Pause, 0=Stop
     global_PVs['Motor_Sample_Top_Z_StopAndGo'].put(3, wait=True)
-    Logger(variableDict['LogFileName']).info('       ***  re-enabling the Smaract: Done!')
+    info('       ***  re-enabling the Smaract: Done!')
     
 
 def add_theta(global_PVs, variableDict, theta_arr):
     # print('add_theta()')
-    # Logger(variableDict['LogFileName']).info(' ')
-    Logger(variableDict['LogFileName']).info('       ***  add_theta')
+    # info(' ')
+    info('       ***  add_theta')
     fullname = global_PVs['HDF1_FullFileName_RBV'].get(as_string=True)
     try:
         hdf_f = h5py.File(fullname, mode='a')
@@ -769,20 +782,20 @@ def add_theta(global_PVs, variableDict, theta_arr):
             theta_ds = hdf_f.create_dataset('/exchange/theta', (len(theta_arr),))
             theta_ds[:] = theta_arr[:]
         hdf_f.close()
-        Logger(variableDict['LogFileName']).info('       ***  add_theta: Done!')
+        info('       ***  add_theta: Done!')
     except:
         traceback.print_exc(file=sys.stdout)
-        Logger(variableDict['LogFileName']).error('       ***  add_theta: Failed accessing:', fullname)
+        error('       ***  add_theta: Failed accessing:', fullname)
 
 
 def add_interfero_hdf5(global_PVs, variableDict, interf_zpx_arrs, interf_zpy_arrs, det_trig_pulses_arrs):
     # print('add_interfero_hdf5()')
-    Logger(variableDict['LogFileName']).info(' ')
-    Logger(variableDict['LogFileName']).info('       ***  add_interfero_hdf5')
+    info(' ')
+    info('       ***  add_interfero_hdf5')
     wait_pv(global_PVs['HDF1_Capture_RBV'], 0, 10.0)
     fullname = global_PVs['HDF1_FullFileName_RBV'].get(as_string=True)
     try:
-        Logger(variableDict['LogFileName']).info('       ***  opening hdf5 file', fullname)
+        info('       ***  opening hdf5 file', fullname)
         hdf_f = h5py.File(fullname, mode='a')
         interf_zpx_ds = hdf_f.create_dataset('/measurement/instrument/interferometer/interfero_zpx_arrs', (len(interf_zpx_arrs),), dtype='f' )
         interf_zpx_ds[:] = interf_zpx_arrs[:]
@@ -794,16 +807,16 @@ def add_interfero_hdf5(global_PVs, variableDict, interf_zpx_arrs, interf_zpy_arr
 #           if len(interf_arrs[i]) == len(interf_arrs[0]):
 #               interf_ds[i,:] = interf_arrs[i][:]
         hdf_f.close()
-        Logger(variableDict['LogFileName']).info('       ***  add_interfero_hdf5: Done')
+        info('       ***  add_interfero_hdf5: Done')
 
     except:
         traceback.print_exc(file=sys.stdout)
-        Logger(variableDict['LogFileName']).error('       ***  add_interfero_hdf5: Failed accessing:', fullname)
+        error('       ***  add_interfero_hdf5: Failed accessing:', fullname)
 
 
 
 def move_dataset_to_run_dir(global_PVs, variableDict):
-    Logger(variableDict['LogFileName']).info('move_dataset_to_run_dir()')
+    info('move_dataset_to_run_dir()')
     try:
         txm_ui = imp.load_source('txm_ui', '/local/usr32idc/DMagic/doc/demo/txm_ui.py')
         run_dir = txm_ui.directory()
@@ -812,7 +825,7 @@ def move_dataset_to_run_dir(global_PVs, variableDict):
         run_full_path = run_dir + '/' + base_name
         shutil.move(full_path, run_full_path)
     except:
-        Logger(variableDict['LogFileName']).error('error moving dataset to run directory')
+        error('error moving dataset to run directory')
     
 
 ########################## Interlaced #########################

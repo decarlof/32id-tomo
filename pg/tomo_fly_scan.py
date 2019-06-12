@@ -11,8 +11,6 @@ import shutil
 import os
 import imp
 import traceback
-import logging
-from datetime import datetime
 
 from tomo_scan_lib import *
 
@@ -49,10 +47,6 @@ variableDict = {'PreDarkImages': 5,
 
 global_PVs = {}
 
-lfname = 'logs/' + datetime.strftime(datetime.now(), "%Y-%m-%d_%H:%M:%S") + '.log'
-LOG, fHandler = setup_logger(lfname)
-variableDict['LogFileName'] = lfname
-
 #def getVariableDict():
 #   return variableDict
 def getVariableDict():
@@ -63,8 +57,8 @@ def get_calculated_num_projections(variableDict):
     # print('get_calculated_num_projections')
     delta = ((float(variableDict['SampleEndPos']) - float(variableDict['SampleStartPos'])) / (float(variableDict['Projections'])))
     slew_speed = (float(variableDict['SampleEndPos']) - float(variableDict['SampleStartPos'])) / (float(variableDict['Projections']) * (float(variableDict['ExposureTime']) + float(variableDict['CCD_Readout'])))
-    Logger(lfname).info('  *** *** start pos %f' % float(variableDict['SampleStartPos']))
-    Logger(lfname).info('  *** *** end pos %f' % float(variableDict['SampleEndPos']))
+    info('  *** *** start pos %f' % float(variableDict['SampleStartPos']))
+    info('  *** *** end pos %f' % float(variableDict['SampleEndPos']))
     # print('start pos ',float(variableDict['SampleStartPos']),'end pos', float(variableDict['SampleEndPos']))
     # # print('############')
     # print(global_PVs['Fly_StartPos'].get())
@@ -74,16 +68,16 @@ def get_calculated_num_projections(variableDict):
     global_PVs['Fly_ScanDelta'].put(delta, wait=True)
     time.sleep(3.0)
     calc_num_proj = global_PVs['Fly_Calc_Projections'].get()
-    Logger(lfname).info('  *** *** calculated number of projections: %f' % calc_num_proj)
+    info(lfname,'  *** *** calculated number of projections: %f' % calc_num_proj)
     if calc_num_proj == None:
-        Logger(lfname).error('  *** *** Error getting fly calculated number of projections!')
+        error('  *** *** Error getting fly calculated number of projections!')
         calc_num_proj = global_PVs['Fly_Calc_Projections'].get()
     if calc_num_proj != int(variableDict['Projections']):
-        Logger(lfname).warning('  *** *** updating number of projections from: %d to %d' % (variableDict['Projections'], calc_num_proj))
+        warning('  *** *** updating number of projections from: %d to %d' % (variableDict['Projections'], calc_num_proj))
         variableDict['Projections'] = int(calc_num_proj)
     # print('Num projections = ',int(variableDict['Projections']), ' fly calc triggers = ', calc_num_proj)
-    Logger(lfname).info('  *** *** Number of projections: %d' % int(variableDict['Projections']))
-    Logger(lfname).info('  *** *** Fly calc triggers: %d' % int(calc_num_proj))
+    info('  *** *** Number of projections: %d' % int(variableDict['Projections']))
+    info('  *** *** Fly calc triggers: %d' % int(calc_num_proj))
 
 def fly_scan(variableDict):
     # print('fly_scan()')
@@ -93,8 +87,8 @@ def fly_scan(variableDict):
     # Estimate the time needed for the flyscan
     FlyScanTimeout = (float(variableDict['Projections']) * (float(variableDict['ExposureTime']) + float(variableDict['CCD_Readout'])) ) + 30
     # print('FlyScanTimeout = ', FlyScanTimeout)
-    Logger(lfname).info(' ')
-    Logger(lfname).info('  *** Fly Scan Time Estimate: %f minutes' % (FlyScanTimeout/60.))
+    info(' ')
+    info('  *** Fly Scan Time Estimate: %f minutes' % (FlyScanTimeout/60.))
     global_PVs['Reset_Theta'].put(1)
 #   global_PVs['Fly_Set_Encoder_Pos'].put(1) # ensure encoder value match motor position -- only for the PIMicos
     global_PVs['Cam1_AcquireTime'].put(float(variableDict['ExposureTime']) )
@@ -108,8 +102,8 @@ def fly_scan(variableDict):
     global_PVs['Cam1_Acquire'].put(DetectorAcquire)
     wait_pv(global_PVs['Cam1_Acquire'], 1)
     # print('Fly')
-    Logger(lfname).info(' ')
-    Logger(lfname).info('  *** Fly Scan: Start!')
+    info(' ')
+    info('  *** Fly Scan: Start!')
     global_PVs['Fly_Run'].put(1, wait=True)
     wait_pv(global_PVs['Fly_Run'], 0)
     # wait for acquire to finish
@@ -118,7 +112,7 @@ def fly_scan(variableDict):
         global_PVs['Cam1_Acquire'].put(DetectorIdle)
     # set trigger move to internal for post dark and white
     #global_PVs['Cam1_TriggerMode'].put('Internal')
-    Logger(lfname).info('  *** Fly Scan: Done!')
+    info('  *** Fly Scan: Done!')
     global_PVs['Proc_Theta'].put(1)
     #theta_cnt = global_PVs['Theta_Cnt'].get()
     theta = global_PVs['Theta_Array'].get(count=int(variableDict['Projections']))
@@ -127,8 +121,8 @@ def fly_scan(variableDict):
 
 def start_scan(variableDict, global_PVs, detector_filename):
     # print('start_scan()')
-    Logger(lfname).info(' ')
-    Logger(lfname).info('  *** start_scan')
+    info(' ')
+    info('  *** start_scan')
 #   init_general_PVs(global_PVs, variableDict)
 
     def cleanup(signal, frame):
@@ -146,40 +140,40 @@ def start_scan(variableDict, global_PVs, detector_filename):
     # Start scan sleep in min so min * 60 = sec
     time.sleep(float(variableDict['StartSleep_min']) * 60.0)
     # print('Launch Taxi before starting capture')
-    Logger(lfname).info(' ')
-    Logger(lfname).info('  *** Taxi before starting capture')
+    info(' ')
+    info('  *** Taxi before starting capture')
     global_PVs['Fly_Taxi'].put(1, wait=True)
     wait_pv(global_PVs['Fly_Taxi'], 0)
-    Logger(lfname).info('  *** Taxi before starting capture: Done!')
+    info('  *** Taxi before starting capture: Done!')
 
     setup_detector(global_PVs, variableDict)
     setup_writer(global_PVs, variableDict, detector_filename)
     if int(variableDict['PreDarkImages']) > 0:
-        Logger(lfname).info(' ')
-        Logger(lfname).info('  *** Pre Dark Fields') 
+        info(' ')
+        info('  *** Pre Dark Fields') 
         close_shutters(global_PVs, variableDict)
         # print('Capturing Pre Dark Field')
         capture_multiple_projections(global_PVs, variableDict, int(variableDict['PreDarkImages']), FrameTypeDark)
-        Logger(lfname).info('  *** Pre Dark Fields: Done!') 
+        info('  *** Pre Dark Fields: Done!') 
     if int(variableDict['PreWhiteImages']) > 0:
         # print('Capturing Pre White Field')
-        Logger(lfname).info(' ')
-        Logger(lfname).info('  *** Pre White Fields')
+        info(' ')
+        info('  *** Pre White Fields')
         global_PVs['Cam1_AcquireTime'].put(float(variableDict['ExposureTime_flat']) )
         open_shutters(global_PVs, variableDict)
         time.sleep(2)
         move_sample_out(global_PVs, variableDict)
         capture_multiple_projections(global_PVs, variableDict, int(variableDict['PreWhiteImages']), FrameTypeWhite)
         global_PVs['Cam1_AcquireTime'].put(float(variableDict['ExposureTime']) )
-        Logger(lfname).info('  *** Pre White Fields: Done!')
+        info('  *** Pre White Fields: Done!')
 
-    Logger(lfname).info(' ')
-    Logger(lfname).info('  *** Setting for fly scan')
+    info(' ')
+    info('  *** Setting for fly scan')
     move_sample_in(global_PVs, variableDict)
     #time.sleep(float(variableDict['StabilizeSleep_ms']) / 1000.0)
     open_shutters(global_PVs, variableDict)
     disable_smaract(global_PVs, variableDict)
-    Logger(lfname).info('  *** Setting for fly scan: Done!')
+    info('  *** Setting for fly scan: Done!')
 
     # run fly scan
     theta = fly_scan(variableDict)
@@ -187,24 +181,24 @@ def start_scan(variableDict, global_PVs, detector_filename):
     enable_smaract(global_PVs, variableDict)
     if int(variableDict['PostWhiteImages']) > 0:
         # print('Capturing Post White Field')
-        Logger(lfname).info(' ')
-        Logger(lfname).info('  *** Post White Fields')
+        info(' ')
+        info('  *** Post White Fields')
         global_PVs['Cam1_AcquireTime'].put(float(variableDict['ExposureTime_flat']) )
         move_sample_out(global_PVs, variableDict)
         capture_multiple_projections(global_PVs, variableDict, int(variableDict['PostWhiteImages']), FrameTypeWhite)
         global_PVs['Cam1_AcquireTime'].put(float(variableDict['ExposureTime']) )
-        Logger(lfname).info('  *** Post White Fields: Done!')
+        info('  *** Post White Fields: Done!')
     if int(variableDict['PostDarkImages']) > 0:
         # print('Capturing Post Dark Field')
-        Logger(lfname).info(' ')
-        Logger(lfname).info('  *** Post Dark Fields') 
+        info(' ')
+        info('  *** Post Dark Fields') 
         close_shutters(global_PVs, variableDict)
         time.sleep(2)
         capture_multiple_projections(global_PVs, variableDict, int(variableDict['PostDarkImages']), FrameTypeDark)
-        Logger(lfname).info('  *** Post Dark Fields: Done!') 
+        info('  *** Post Dark Fields: Done!') 
 
-    Logger(lfname).info(' ')
-    Logger(lfname).info('  *** Finalizing scan') 
+    info(' ')
+    info('  *** Finalizing scan') 
     close_shutters(global_PVs, variableDict)
     time.sleep(0.25)
     wait_pv(global_PVs['HDF1_Capture_RBV'], 0, 600)
@@ -218,7 +212,7 @@ def start_scan(variableDict, global_PVs, detector_filename):
     if False == wait_pv(global_PVs['HDF1_Capture'], 0, 10):
         global_PVs['HDF1_Capture'].put(0)
     reset_CCD(global_PVs, variableDict)
-    Logger(lfname).info('  *** Finalizing scan: Done!') 
+    info('  *** Finalizing scan: Done!') 
 
 
 def main():
@@ -230,12 +224,12 @@ def main():
 #   global_PVs['HDF1_NextFile'].put(0)
     for iLoop in range(0,nLoops):
         # print('\n## Starting fly scan %i' % (iLoop+1))
-        Logger(lfname).info('  *** Starting fly scan %i' % (iLoop+1))
+        info('  *** Starting fly scan %i' % (iLoop+1))
         global_PVs['Motor_SampleRot'].put(0, wait=True, timeout=600.0)
         start_scan(variableDict, global_PVs, FileName)
         # print((time.time() - tic)/60)
-        Logger(lfname).info(' ')
-        Logger(lfname).info('  *** Total scan time: %s minutes' % str((time.time() - tic)/60.))
+        info(' ')
+        info('  *** Total scan time: %s minutes' % str((time.time() - tic)/60.))
         
 
 if __name__ == '__main__':
