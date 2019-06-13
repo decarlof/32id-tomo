@@ -55,6 +55,7 @@ def getVariableDict():
     return variableDict
 
 def get_calculated_num_projections(variableDict):
+    info(' ')
     info('  *** get_calculated_num_projections')
     delta = abs((float(variableDict['SampleEndPos']) - float(variableDict['SampleStartPos'])) / (float(variableDict['Projections'])))
     slew_speed = (float(variableDict['SampleEndPos']) - float(variableDict['SampleStartPos'])) / (float(variableDict['Projections']) * (float(variableDict['ExposureTime']) + float(variableDict['CCD_Readout'])))
