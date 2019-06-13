@@ -23,7 +23,7 @@ def scp(global_PVs, variableDict):
 #    log_lib.Logger(variableDict['LogFileName']).info('  *** *** origin: %s' % fname_origin)
 #    log_lib.Logger(variableDict['LogFileName']).info('  *** *** destination: %s' % fname_destination)
 #    Logger(variableDict['LogFileName']).info('  *** *** origin: %s' % fname_origin)
-#    Logger(variableDict['LogFileName']).info('  *** *** destination: %s' % fname_destination)
+    info('  *** *** destination: %s' % fname_destination)
 
     err = os.system('scp -q ' + fname_origin + ' ' + fname_destination + '&')
 #    if (err == 0):
