@@ -45,7 +45,6 @@ variableDict = {'PreDarkImages': 0,
         'nLoops': 1,
         'CCD_Readout': 0.05,
         'RemoteAnalysisDir': 'usr32idc@txmtwo:/local/dataraid/'
-#        'LogFileName': 'log.log'
         }
 
 
@@ -56,14 +55,11 @@ def getVariableDict():
     return variableDict
 
 def get_calculated_num_projections(variableDict):
-    # print('get_calculated_num_projections')
+    info('  *** get_calculated_num_projections')
     delta = abs((float(variableDict['SampleEndPos']) - float(variableDict['SampleStartPos'])) / (float(variableDict['Projections'])))
     slew_speed = (float(variableDict['SampleEndPos']) - float(variableDict['SampleStartPos'])) / (float(variableDict['Projections']) * (float(variableDict['ExposureTime']) + float(variableDict['CCD_Readout'])))
     info('  *** *** start pos %f' % float(variableDict['SampleStartPos']))
     info('  *** *** end pos %f' % float(variableDict['SampleEndPos']))
-    # print('start pos ',float(variableDict['SampleStartPos']),'end pos', float(variableDict['SampleEndPos']))
-    # # print('############')
-    # print(global_PVs['Fly_StartPos'].get())
     global_PVs['Fly_StartPos'].put(float(variableDict['SampleStartPos']), wait=True)
     global_PVs['Fly_EndPos'].put(float(variableDict['SampleEndPos']), wait=True)
     global_PVs['Fly_SlewSpeed'].put(slew_speed, wait=True)
@@ -77,9 +73,9 @@ def get_calculated_num_projections(variableDict):
     if calc_num_proj != int(variableDict['Projections']):
         warning('  *** *** updating number of projections from: %d to %d' % (variableDict['Projections'], calc_num_proj))
         variableDict['Projections'] = int(calc_num_proj)
-    # print('Num projections = ',int(variableDict['Projections']), ' fly calc triggers = ', calc_num_proj)
     info('  *** *** Number of projections: %d' % int(variableDict['Projections']))
     info('  *** *** Fly calc triggers: %d' % int(calc_num_proj))
+    info('  *** get_calculated_num_projections: Done!')
 
 def fly_scan(variableDict):
     theta = []
