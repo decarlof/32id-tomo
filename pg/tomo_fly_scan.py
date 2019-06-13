@@ -51,15 +51,13 @@ variableDict = {'PreDarkImages': 0,
 
 global_PVs = {}
 
-#def getVariableDict():
-#   return variableDict
 def getVariableDict():
     global variableDict
     return variableDict
 
 def get_calculated_num_projections(variableDict):
     # print('get_calculated_num_projections')
-    delta = ((float(variableDict['SampleEndPos']) - float(variableDict['SampleStartPos'])) / (float(variableDict['Projections'])))
+    delta = abs((float(variableDict['SampleEndPos']) - float(variableDict['SampleStartPos'])) / (float(variableDict['Projections'])))
     slew_speed = (float(variableDict['SampleEndPos']) - float(variableDict['SampleStartPos'])) / (float(variableDict['Projections']) * (float(variableDict['ExposureTime']) + float(variableDict['CCD_Readout'])))
     info('  *** *** start pos %f' % float(variableDict['SampleStartPos']))
     info('  *** *** end pos %f' % float(variableDict['SampleEndPos']))
