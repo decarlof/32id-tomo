@@ -9,7 +9,7 @@ import pathlib
 from paramiko import SSHClient
 from scp import SCPClient
 
-from tomo_scan_lib import *
+from libs.tomo_scan_lib import *
 
 
 def scp(global_PVs, variableDict):

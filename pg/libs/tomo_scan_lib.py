@@ -16,7 +16,7 @@ import math
 import signal
 import numpy
 
-from log_lib import *
+from libs.log_lib import *
 
 TESTING_MODE = True
 UseShutterA = False

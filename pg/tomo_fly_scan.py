@@ -12,9 +12,9 @@ import os
 import imp
 import traceback
 
-from tomo_scan_lib import *
-from dm_lib import *
-from log_lib import *
+from libs.tomo_scan_lib import *
+from libs.dm_lib import *
+from libs.log_lib import *
 
 global variableDict
 
