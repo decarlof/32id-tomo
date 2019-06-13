@@ -10,7 +10,6 @@ from paramiko import SSHClient
 from scp import SCPClient
 
 from tomo_scan_lib import *
-import logging
 
 
 def scp(global_PVs, variableDict):
