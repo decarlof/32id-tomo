@@ -27,9 +27,7 @@ def scp(global_PVs, variableDict):
     info('  *** *** destination: %s' % fname_destination)
 
     err = os.system('scp -q ' + fname_origin + ' ' + fname_destination + '&')
-#    if (err == 0):
-##        log_lib.Logger(variableDict['LogFileName']).info('  *** start scp: Done!')
-#        Logger(variableDict['LogFileName']).info('  *** start scp: Done!')
-#    else:
-##        log_lib.Logger(variableDict['LogFileName']).error('  *** scp error: check that destination directory exists at %s' % (fname_destination))
-#        Logger(variableDict['LogFileName']).error('  *** scp error: check that destination directory exists at %s' % (fname_destination))
+    if (err == 0):
+        info('  *** start scp: Done!')
+    else:
+        error('  *** scp error: check that destination directory exists at %s' % (fname_destination))
