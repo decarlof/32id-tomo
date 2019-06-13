@@ -11,11 +11,10 @@ import shutil
 import os
 import imp
 import traceback
-import logging
-from datetime import datetime
 
 from tomo_scan_lib import *
 from dm_lib import *
+from log_lib import *
 
 global variableDict
 
