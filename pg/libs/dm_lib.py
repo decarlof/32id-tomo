@@ -9,20 +9,20 @@ import pathlib
 from paramiko import SSHClient
 from scp import SCPClient
 
-from libs.log_lib import *
-
+import libs.log_lib as log_lib
 
 def scp(global_PVs, variableDict):
-    info('      *** start scp')
+    log_lib.info(' ')
+    log_lib.info('  *** start scp')
     fname_origin = global_PVs['HDF1_FullFileName_RBV'].get(as_string=True)
     p = pathlib.Path(fname_origin)
     
     fname_destination = variableDict['RemoteAnalysisDir'] + p.parts[-3] + '/' + p.parts[-2] + '/'
-    info('           *** origin: %s' % fname_origin)
-    info('           *** destination: %s' % fname_destination)
+    log_lib.info('      *** origin: %s' % fname_origin)
+    log_lib.info('      *** destination: %s' % fname_destination)
 
     err = os.system('scp -q ' + fname_origin + ' ' + fname_destination + '&')
     if (err == 0):
-        info('      *** start scp: Done!')
+        log_lib.info('  *** start scp: Done!')
     else:
-        error('      *** scp error: check that destination directory exists at %s' % (fname_destination))
+        log_lib.error('  *** scp error: check that destination directory exists at %s' % (fname_destination))
