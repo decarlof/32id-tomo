@@ -9,7 +9,7 @@ import pathlib
 from paramiko import SSHClient
 from scp import SCPClient
 
-from libs.aps32id_lib import *
+# from libs.aps32id_lib import *
 
 
 def scp(global_PVs, variableDict):
