@@ -202,6 +202,11 @@ def start_scan(variableDict, global_PVs, detector_filename):
 
 
 def main():
+
+    # create logger
+    lfname = logs_home + datetime.strftime(datetime.now(), "%Y-%m-%d_%H:%M:%S") + '.log'
+    setup_logger(lfname)
+
     tic = time.time()
     update_variable_dict(variableDict)
     init_general_PVs(global_PVs, variableDict)

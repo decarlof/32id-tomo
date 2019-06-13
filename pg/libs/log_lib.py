@@ -55,6 +55,4 @@ def setup_logger(log_name, stream_to_console=True):
         ch.setLevel(logging.DEBUG)
         logger.addHandler(ch)
 
-# create logger
-lfname = logs_home + datetime.strftime(datetime.now(), "%Y-%m-%d_%H:%M:%S") + '.log'
-setup_logger(lfname)
+
