@@ -76,8 +76,8 @@ def setup_logger(log_name, stream_to_console=True):
     global error_extra
 
     # make sure logs directory exists
-    if not os.path.exists("logs/"):
-        os.makedirs("logs/")
+    if not os.path.exists(logs_home):
+        os.makedirs(logs_home)
     info_extra['logger_name'] = log_name
     warn_extra['logger_name'] = log_name
     error_extra['logger_name'] = log_name
@@ -132,8 +132,8 @@ def wait_pv(pv, wait_val, max_timeout_sec=-1):
 
 
 def init_general_PVs(global_PVs, variableDict):
-    # print('init_PVs()')
-    #init detector pv's
+    info(' ')
+    info('  *** Init general PVs')
     global_PVs['Cam1_ImageMode'] = PV(variableDict['IOC_Prefix'] + 'cam1:ImageMode') # 0=single, 1=multiple, 2=continuous
     global_PVs['Cam1_ArrayCallbacks'] = PV(variableDict['IOC_Prefix'] + 'cam1:ArrayCallbacks')
     global_PVs['Cam1_AcquireTime'] = PV(variableDict['IOC_Prefix'] + 'cam1:AcquireTime')
@@ -229,6 +229,7 @@ def init_general_PVs(global_PVs, variableDict):
     global_PVs['zone_plate_x_StopAndGo'] = PV('32idcTXM:mcs:c2:m1.SPMG')
     global_PVs['zone_plate_y_StopAndGo'] = PV('32idcTXM:mcs:c2:m2.SPMG')
     global_PVs['zone_plate_z_StopAndGo'] = PV('32idcTXM:mcs:c2:m3.SPMG')
+
     # MST2 = vertical axis
 #   global_PVs['Smaract_mode'] = PV('32idcTXM:mcsAsyn1.AOUT') # pv.Smaract_mode.put(':MST3,100,500,100')
 #   global_PVs['zone_plate_2_x'] = PV('32idcTXM:mcs:c0:m3.VAL')
@@ -380,11 +381,10 @@ def init_general_PVs(global_PVs, variableDict):
     global_PVs['Interlaced_Images_Per_Cycle_RBV'] = PV('32idcTXM:iFly:interlaceFlySub.VALF')
     global_PVs['Interlaced_Num_Sub_Cycles'] = PV('32idcTXM:iFly:interlaceFlySub.B')
     global_PVs['Interlaced_Num_Sub_Cycles_RBV'] = PV('32idcTXM:iFly:interlaceFlySub.VALG')
+    info('  *** Init general PVs: Done!')
 
 
 def stop_scan(global_PVs, variableDict):
-    # print('YEP!!!!')
-    # print('Stop scan called!')
     info(' ')
     info('  *** Stop scan')
     global_PVs['Motor_SampleRot_Stop'].put(1)
@@ -464,7 +464,6 @@ def setup_detector(global_PVs, variableDict):
 
 
 def setup_writer(global_PVs, variableDict, filename=None):
-    # print 'setup_writer()'
     info('  ')
     info('  *** setup hdf_writer')
     global_PVs['HDF1_LazyOpen'].put(0)
@@ -564,7 +563,7 @@ def capture_multiple_projections(global_PVs, variableDict, num_proj, frame_type)
 
 
 def move_sample_in(global_PVs, variableDict):
-    info('       ***  move_sample_in')
+    info('       ***  move_sample_in: %s ' % str(variableDict['SampleXIn']))
 #   global_PVs['Motor_X_Tile'].put(float(variableDict['SampleXIn']), wait=True)
 #   global_PVs['Motor_SampleX'].put(float(variableDict['SampleXIn']), wait=True)
     global_PVs['Motor_Sample_Top_X'].put(float(variableDict['SampleXIn']), wait=True)
@@ -577,12 +576,12 @@ def move_sample_in(global_PVs, variableDict):
 #   global_PVs['Motor_SampleY'].put(float(variableDict['SampleYIn']), wait=True)
 #   global_PVs['Motor_SampleZ'].put(float(variableDict['SampleZIn']), wait=True)
 #   global_PVs['Motor_SampleRot'].put(0, wait=True)
-    info('       ***  move_sample_in: Done!')
+     info('       ***  move_sample_in: %s: Done! ' % str(variableDict['SampleXIn']))
 
 
 def move_sample_out(global_PVs, variableDict):
     # print 'move_sample_out()'
-    info('       ***  move_sample_out')
+    info('       ***  move_sample_out: %s ' % str(variableDict['SampleXOut']))
 #   global_PVs['Motor_SampleRot'].put(float(variableDict['SampleRotOut']), wait=True)
 #   global_PVs['Motor_X_Tile'].put(float(variableDict['SampleXOut']), wait=True)
 #   global_PVs['Motor_SampleX'].put(float(variableDict['SampleXOut']), wait=True)
@@ -597,7 +596,7 @@ def move_sample_out(global_PVs, variableDict):
 #   global_PVs['Motor_SampleY'].put(float(variableDict['SampleYOut']), wait=True)
 #   global_PVs['Motor_SampleZ'].put(float(variableDict['SampleZOut']), wait=True)
 #   global_PVs['Motor_SampleRot'].put(0, wait=True)
-    info('       ***  move_sample_out: Done!')
+    info('       ***  move_sample_out: %s: Done!' % str(variableDict['SampleXOut']))
 
 def open_shutters(global_PVs, variableDict):
     info('       ***  open_shutters')
@@ -615,7 +614,6 @@ def open_shutters(global_PVs, variableDict):
 
 
 def close_shutters(global_PVs, variableDict):
-    # print('close_shutters()')
     info('       ***  close_shutters')
     if TESTING_MODE:
         warning('       ***  testing mode - shutters are deactivated during the scans !!!!')
@@ -698,6 +696,7 @@ def disable_fast_shutter(global_PVs, variableDict):
 def auto_focus_microCT(global_PVs, variableDict, rscan_range, nSteps, ScanMotorName):
     info('  ***  start auto focus scan...')
     init_general_PVs(global_PVs, variableDict)
+
     if variableDict.has_key('StopTheScan'): # stopping the scan in a clean way
         stop_scan(global_PVs, variableDict)
     return
@@ -770,7 +769,6 @@ def enable_smaract(global_PVs, variableDict):
     
 
 def add_theta(global_PVs, variableDict, theta_arr):
-    # print('add_theta()')
     info('       ***  add_theta')
     fullname = global_PVs['HDF1_FullFileName_RBV'].get(as_string=True)
     try:
