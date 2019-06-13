@@ -9,6 +9,7 @@ import pathlib
 from paramiko import SSHClient
 from scp import SCPClient
 
+from tomo_scan_lib import *
 #import log_lib
 import logging
 
