@@ -576,7 +576,7 @@ def move_sample_in(global_PVs, variableDict):
 #   global_PVs['Motor_SampleY'].put(float(variableDict['SampleYIn']), wait=True)
 #   global_PVs['Motor_SampleZ'].put(float(variableDict['SampleZIn']), wait=True)
 #   global_PVs['Motor_SampleRot'].put(0, wait=True)
-     info('       ***  move_sample_in: %s: Done! ' % str(variableDict['SampleXIn']))
+    info('       ***  move_sample_in: %s: Done! ' % str(variableDict['SampleXIn']))
 
 
 def move_sample_out(global_PVs, variableDict):
