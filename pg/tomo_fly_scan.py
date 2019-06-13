@@ -12,7 +12,7 @@ import os
 import imp
 import traceback
 
-from libs.tomo_scan_lib import *
+from libs.aps32id_lib import *
 from libs.dm_lib import *
 from libs.log_lib import *
 
