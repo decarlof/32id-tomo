@@ -59,7 +59,15 @@ def getVariableDict():
 def main():
 
     # create logger
-    logs_home = '/home/beams/USR32IDC/logs/'
+    # # python 3.5+ 
+    # home = str(pathlib.Path.home())
+    home = os.path.expanduser("~")
+    logs_home = home + '/logs/'
+
+    # make sure logs directory exists
+    if not os.path.exists(logs_home):
+        os.makedirs(logs_home)
+
     lfname = logs_home + datetime.strftime(datetime.now(), "%Y-%m-%d_%H:%M:%S") + '.log'
     log_lib.setup_logger(lfname)
 

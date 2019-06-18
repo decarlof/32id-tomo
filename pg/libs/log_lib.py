@@ -1,6 +1,8 @@
-import os
+'''
+    Log Lib for Sector 2-BM 
+    
+'''
 import logging
-from datetime import datetime
 
 # Logging defines
 __GREEN = "\033[92m"
@@ -8,7 +10,6 @@ __RED = '\033[91m'
 __YELLOW = '\033[33m'
 __ENDC = '\033[0m'
 
-logs_home = '/home/beams/USR32IDC/logs/'
 
 logger = None
 info_extra={'endColor': __ENDC, 'color': __GREEN}
@@ -37,9 +38,6 @@ def setup_logger(log_name, stream_to_console=True):
     global warn_extra
     global error_extra
 
-    # make sure logs directory exists
-    if not os.path.exists(logs_home):
-        os.makedirs(logs_home)
     info_extra['logger_name'] = log_name
     warn_extra['logger_name'] = log_name
     error_extra['logger_name'] = log_name
@@ -54,5 +52,3 @@ def setup_logger(log_name, stream_to_console=True):
         ch.setFormatter(formatter)
         ch.setLevel(logging.DEBUG)
         logger.addHandler(ch)
-
-
