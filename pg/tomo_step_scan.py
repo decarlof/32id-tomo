@@ -12,7 +12,7 @@ import os
 import imp
 import traceback
 import numpy
-from tomo_scan_lib import *
+from libs.aps32id_lib import *
 #import matplotlib.pyplot as plt
 global variableDict
 
