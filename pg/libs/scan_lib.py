@@ -34,6 +34,8 @@ def tomo_fly_scan(variableDict, global_PVs, detector_filename):
         stop_scan(global_PVs, variableDict)
         return
 
+    aps32id_lib.disable_fast_shutter(global_PVs, variableDict)
+
     # Start scan sleep in min so min * 60 = sec
     time.sleep(float(variableDict['StartSleep_min']) * 60.0)
 
