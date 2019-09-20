@@ -20,12 +20,12 @@ from datetime import datetime
 
 global variableDict
 
-variableDict = {'PreDarkImages': 1,
-        'PreWhiteImages': 2,
-        'Projections': 20,
-        'PostDarkImages': 10,
+variableDict = {'PreDarkImages': 5,
+        'PreWhiteImages': 10,
+        'Projections': 1210,
+        'PostDarkImages': 5,
         'PostWhiteImages': 10,
-        'SampleXOut': 0.0,
+        'SampleXOut': 0.4,
         'SampleYOut': 0.0,
         'SampleZOut': 0.0,
 #       'SampleRotOut': 0.0,
@@ -33,11 +33,11 @@ variableDict = {'PreDarkImages': 1,
         'SampleYIn': 0.0,
         'SampleZIn': 0.0,
         'SampleStartPos': 0.0,
-        'SampleEndPos': 20.0,
+        'SampleEndPos': 180.0,
         'StartSleep_min': 0,
         'StabilizeSleep_ms': 0,
-        'ExposureTime': 0.2,
-        'ExposureTime_flat': 0.2,
+        'ExposureTime': 0.5,
+        'ExposureTime_flat': 0.5,
         'ShutterOpenDelay': 0.00,
         'IOC_Prefix': '32idcPG3:',
         'ExternalShutter': 0,
@@ -85,6 +85,5 @@ def main():
         log_lib.info(' ')
         log_lib.info('  *** Total scan time: %s minutes' % str((time.time() - tic)/60.))
         
-
 if __name__ == '__main__':
     main()

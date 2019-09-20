@@ -18,7 +18,7 @@ import numpy
 
 import libs.log_lib as log_lib
 
-TESTING_MODE = True
+TESTING_MODE = False
 UseShutterA = False
 UseShutterB = True
 
@@ -511,6 +511,7 @@ def move_sample_in(global_PVs, variableDict):
 #   global_PVs['Motor_X_Tile'].put(float(variableDict['SampleXIn']), wait=True)
 #   global_PVs['Motor_SampleX'].put(float(variableDict['SampleXIn']), wait=True)
     global_PVs['Motor_Sample_Top_X'].put(float(variableDict['SampleXIn']), wait=True)
+    global_PVs['Motor_Sample_Top_Z'].put(float(variableDict['SampleZIn']), wait=True)
     if False == wait_pv(global_PVs['Motor_Sample_Top_X_RBV'], float(variableDict['SampleXIn']), 60):
         log_lib.error('       ***  Motor_Sample_Top_X did not move in properly')
         print(global_PVs['Motor_Sample_Top_X_STATUS'].get())
@@ -530,6 +531,7 @@ def move_sample_out(global_PVs, variableDict):
 #   global_PVs['Motor_X_Tile'].put(float(variableDict['SampleXOut']), wait=True)
 #   global_PVs['Motor_SampleX'].put(float(variableDict['SampleXOut']), wait=True)
     global_PVs['Motor_Sample_Top_X'].put(float(variableDict['SampleXOut']), wait=True)
+    global_PVs['Motor_Sample_Top_Z'].put(float(variableDict['SampleZOut']), wait=True)
     #global_PVs['Motor_SampleRot'].put(float(variableDict['SampleRotOut']), wait=True)
     if False == wait_pv(global_PVs['Motor_Sample_Top_X_RBV'], float(variableDict['SampleXOut']), 60):
         log_lib.error('       ***  Motor_Sample_Top_X did not move out properly')

@@ -12,17 +12,19 @@ import os
 import imp
 import traceback
 import numpy
+#from libs.aps32id_lib import *
 from tomo_scan_lib import *
+
 #import matplotlib.pyplot as plt
 global variableDict
 
-variableDict = {'PreDarkImages': 5,
+variableDict = {'PreDarkImages': 4,
         'PreWhiteImages': 10,
-        'Projections': 721,
+        'Projections': 100,
         'ProjectionsPerRot': 1, # saving several images / angle
-        'PostDarkImages': 0,
-        'PostWhiteImages': 0,
-        'SampleXOut': 0,
+        'PostDarkImages': 4,
+        'PostWhiteImages': 10,
+        'SampleXOut': 0.2,
 #        'SampleYOut': 0.1,
 #        'SampleZOut': 0,
 #        'SampleRotOut': 90.0,
@@ -37,13 +39,14 @@ variableDict = {'PreDarkImages': 5,
         'ExposureTime_Flat': 0.5,
         'IOC_Prefix': '32idcPG3:',
         'FileWriteMode': 'Stream',
-        'Interlaced': 0,
+        'Interlaced': 1,
         'Interlaced_Sub_Cycles': 4,
         'rot_speed_deg_per_s': 2,
         'Recursive_Filter_Enabled': 0,
         'Recursive_Filter_N_Images': 5,
         'Recursive_Filter_Type': 'RecursiveAve',
-        'Use_Fast_Shutter': 1,
+        'Use_Fast_Shutter': 0,
+        'nLoops': 1,
         'Display_live': 1
         }
 
@@ -66,7 +69,8 @@ def tomo_scan():
     step_size = ((float(variableDict['SampleEnd_Rot']) - float(variableDict['SampleStart_Rot'])) / (float(variableDict['Projections']) - 1.0))
     if variableDict.has_key('Interlaced') and int(variableDict['Interlaced']) > 0:
 #        theta = gen_interlaced_theta()
-        theta = gen_interlaced_bidirectional(variableDict)
+        theta = gen_interlaced_bidirectional(variableDict) # Tekin algo
+#        theta = gen_interlaced_theta_W(variableDict) # Wolfgang algo
     else:
         theta = numpy.arange(float(variableDict['SampleStart_Rot']), float(variableDict['Projections'])*step_size, step_size)
     global_PVs['Cam1_FrameType'].put(FrameTypeData, wait=True)
@@ -75,7 +79,8 @@ def tomo_scan():
         global_PVs['Proc1_Filter_Enable'].put('Enable')
 
     for sample_rot in theta:
-        print('Sample Rot:', sample_rot)
+        print(' ')
+        print('-->Sample Rot:' +str(sample_rot))
         global_PVs['Motor_SampleRot'].put(sample_rot, wait=True)
         print('Stabilize Sleep (ms)', variableDict['StabilizeSleep_ms'])
         time.sleep(float(variableDict['StabilizeSleep_ms']) / 1000.0)
@@ -187,7 +192,10 @@ def main():
     update_variable_dict(variableDict)
     init_general_PVs(global_PVs, variableDict)
     FileName = global_PVs['HDF1_FileName'].get(as_string=True)
-    full_tomo_scan(variableDict, FileName)
+
+    nLoops = variableDict['nLoops']
+    for iLoop in range(0,nLoops):
+        full_tomo_scan(variableDict, FileName)
 
 if __name__ == '__main__':
     main()

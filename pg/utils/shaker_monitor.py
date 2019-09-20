@@ -9,6 +9,3 @@ while shaking:
         shaker_status.put(1)
     time.sleep(0.2) # checking every 200 ms
     
-        
-    
-    
