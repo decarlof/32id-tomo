@@ -18,7 +18,7 @@ import numpy
 
 import libs.log_lib as log_lib
 
-TESTING_MODE = False
+TESTING_MODE = True
 UseShutterA = False
 UseShutterB = True
 
@@ -137,6 +137,7 @@ def init_general_PVs(global_PVs, variableDict):
             global_PVs['Motor_SampleX'] = PV('32idcTXM:nf:c0:m1.VAL')
             global_PVs['Motor_SampleY'] = PV('32idcTXM:mxv:c1:m1.VAL') # for the TXM
             global_PVs['Motor_SampleRot'] = PV('32idcTXM:ens:c1:m1.VAL') # Professional Instrument air bearing 0y stage
+            global_PVs['Motor_SampleRot_set'] = PV('32idcTXM:ens:c1:m1.SET') # Professional Instrument air bearing 0y stage
             global_PVs['Motor_SampleRot_Speed'] = PV('32idcTXM:ens:c1:m1.VELO') # Professional Instrument air bearing rotary stage
             global_PVs['Motor_SampleRot_Stop'] = PV('32idcTXM:ens:c1:m1.STOP') # PI Micos air bearing rotary stage
             global_PVs['Motor_Sample_Top_X'] = PV('32idcTXM:mcs:c3:m7.VAL') # Smaract XZ TXM set
@@ -173,6 +174,10 @@ def init_general_PVs(global_PVs, variableDict):
     global_PVs['zone_plate_x_StopAndGo'] = PV('32idcTXM:mcs:c2:m1.SPMG')
     global_PVs['zone_plate_y_StopAndGo'] = PV('32idcTXM:mcs:c2:m2.SPMG')
     global_PVs['zone_plate_z_StopAndGo'] = PV('32idcTXM:mcs:c2:m3.SPMG')
+
+    #Phase ring:
+    global_PVs['phase_ring_x'] = PV('32idcSOFT:mmc:c1:m2.VAL')
+    global_PVs['phase_ring_y'] = PV('32idcSOFT:mmc:c1:m1.VAL')
 
     # MST2 = vertical axis
 #   global_PVs['Smaract_mode'] = PV('32idcTXM:mcsAsyn1.AOUT') # pv.Smaract_mode.put(':MST3,100,500,100')
@@ -483,6 +488,17 @@ def setup_tiff_writer(global_PVs, variableDict, filename=None):
     wait_pv(global_PVs['TIFF1_Capture'], 1)
     log_lib.info('  *** setup_tiff_writer: Done!')
 
+def acquire_proj(global_PVs, variableDict):
+    global_PVs['Cam1_Acquire'].put(DetectorAcquire)
+    wait_pv(global_PVs['Cam1_Acquire'], DetectorAcquire, 2)
+    if variableDict['Use_Fast_Shutter']:
+        global_PVs['Fast_Shutter_Trigger'].put(1)
+#                wait_pv(global_PVs['Fast_Shutter_Trigger'], DetectorIdle, 60)
+        wait_pv(global_PVs['Cam1_Acquire'], DetectorIdle, 60)
+    else:
+        global_PVs['Cam1_SoftwareTrigger'].put(1)
+        wait_pv(global_PVs['Cam1_Acquire'], DetectorIdle, 60)
+
 def capture_multiple_projections(global_PVs, variableDict, num_proj, frame_type):
     log_lib.info('       ***  capture_multiple_projections %d ' % num_proj)
     wait_time_sec = int(variableDict['ExposureTime']) + 5
@@ -497,7 +513,6 @@ def capture_multiple_projections(global_PVs, variableDict, num_proj, frame_type)
             wait_pv(global_PVs['Cam1_Acquire'], DetectorAcquire, 2)
             global_PVs['Cam1_SoftwareTrigger'].put(1)
             wait_pv(global_PVs['Cam1_Acquire'], DetectorIdle, wait_time_sec)
-
     else:
         global_PVs['Cam1_TriggerMode'].put('Internal')
         global_PVs['Cam1_NumImages'].put(int(num_proj))
@@ -505,6 +520,32 @@ def capture_multiple_projections(global_PVs, variableDict, num_proj, frame_type)
         wait_pv(global_PVs['Cam1_Acquire'], DetectorIdle, wait_time_sec)
     log_lib.info('       ***  capture_multiple_projections: Done!')
 
+def acquire_proj_recursive_filt(global_PVs, variableDict):
+    global_PVs['Proc1_Callbacks'].put('Enable', wait=True)
+    for k in range(int(variableDict['Recursive_Filter_N_Images'])):
+        global_PVs['Cam1_Acquire'].put(DetectorAcquire)
+        wait_pv(global_PVs['Cam1_Acquire'], DetectorAcquire, 2)
+        if variableDict['Use_Fast_Shutter']:
+            global_PVs['Fast_Shutter_Trigger'].put(1)
+#           wait_pv(global_PVs['Fast_Shutter_Trigger'], DetectorIdle, 60)
+            wait_pv(global_PVs['Cam1_Acquire'], DetectorIdle, 60)
+        else:
+            global_PVs['Cam1_SoftwareTrigger'].put(1)
+            wait_pv(global_PVs['Cam1_Acquire'], DetectorIdle, 60)
+    log_lib.info('       ***  capture with rec. filt.: Done!')
+
+def acq_mutliple_proj_per_rot(global_PVs, variableDict):
+    for j in range( int(variableDict['ProjectionsPerRot']) ):
+        log_lib.info('    acq. proj %i/%i' % (j+1, variableDict['ProjectionsPerRot']))
+        global_PVs['Cam1_Acquire'].put(DetectorAcquire)
+        wait_pv(global_PVs['Cam1_Acquire'], DetectorAcquire, 2)
+        if variableDict['Use_Fast_Shutter']:
+            global_PVs['Fast_Shutter_Trigger'].put(1)
+#                    wait_pv(global_PVs['Fast_Shutter_Trigger'], DetectorIdle, 60)
+            wait_pv(global_PVs['Cam1_Acquire'], DetectorIdle, 60)
+        else:
+            global_PVs['Cam1_SoftwareTrigger'].put(1)
+            wait_pv(global_PVs['Cam1_Acquire'], DetectorIdle, 60)
 
 def move_sample_in(global_PVs, variableDict):
     log_lib.info('       ***  move_sample_in: %s ' % str(variableDict['SampleXIn']))
@@ -616,6 +657,7 @@ def enable_fast_shutter(global_PVs, variableDict, rotation_trigger=False, delay=
     global_PVs['Fast_Shutter_Delay'].put(delay, wait=True)
     # Disable the "uniblitz" fast shutter safety
     global_PVs['Fast_Shutter_Uniblitz'].put(0, wait=True)
+    global_PVs['Fast_Shutter_Exposure'].put(float(variableDict['ExposureTime']) , wait=True)
 
 
 def disable_fast_shutter(global_PVs, variableDict):
@@ -728,6 +770,14 @@ def add_theta(global_PVs, variableDict, theta_arr):
         traceback.print_exc(file=sys.stdout)
         log_lib.error('       ***  add_theta: Failed accessing:', fullname)
 
+def update_theta_for_more_proj(orig_theta, variableDict):
+    new_theta = []
+    for val in orig_theta:
+        for j in range( int(variableDict['ProjectionsPerRot']) ):
+            new_theta += [val]
+    return new_theta
+
+
 def add_interferometer(global_PVs, variableDict, theta):
     if variableDict.has_key('UseInterferometer') and int(variableDict['UseInterferometer']) > 0:
             interf_zpx = global_PVs['Interfero_ZPX'].get()
@@ -810,7 +860,6 @@ def acquire_fly(global_PVs, variableDict):
     # start acquiring
     global_PVs['Cam1_Acquire'].put(DetectorAcquire)
     wait_pv(global_PVs['Cam1_Acquire'], 1)
-    # print('Fly')
     log_lib.info(' ')
     log_lib.info('  *** Fly Scan: Start!')
     global_PVs['Fly_Run'].put(1, wait=True)
@@ -840,7 +889,7 @@ def acquire_pre_flat(variableDict, global_PVs):
     if int(variableDict['PreWhiteImages']) > 0:
         log_lib.info(' ')
         log_lib.info('  *** Pre White Fields')
-        global_PVs['Cam1_AcquireTime'].put(float(variableDict['ExposureTime_flat']) )
+        global_PVs['Cam1_AcquireTime'].put(float(variableDict['ExposureTime_Flat']) )
         open_shutters(global_PVs, variableDict)
         time.sleep(2)
         move_sample_out(global_PVs, variableDict)
@@ -853,7 +902,7 @@ def acquire_post_flat(variableDict, global_PVs):
     if int(variableDict['PostWhiteImages']) > 0:
         log_lib.info(' ')
         log_lib.info('  *** Post White Fields')
-        global_PVs['Cam1_AcquireTime'].put(float(variableDict['ExposureTime_flat']) )
+        global_PVs['Cam1_AcquireTime'].put(float(variableDict['ExposureTime_Flat']) )
         move_sample_out(global_PVs, variableDict)
         capture_multiple_projections(global_PVs, variableDict, int(variableDict['PostWhiteImages']), FrameTypeWhite)
         global_PVs['Cam1_AcquireTime'].put(float(variableDict['ExposureTime']) )
@@ -947,4 +996,42 @@ def gen_interlaced_theta_Tim():
     theta_arr = theta_arr_tmp
 
     return theta_arr
+
+def gen_interlaced_theta_W(variableDict):
+    #set num cycles to 1 so we only do 1 scan
+    numproj = variableDict['Projections']
+    prime = variableDict['Interlaced_prime']
+    nProj_per_rot = variableDict['Interlaced_prj_per_rot']
+
+    seq = []
+    i = 0
+    modulus = False # False = angle will increase above 360 degrees
+    while len(seq) < numproj:
+        b = i
+        i += 1
+        r = 0
+        q = 1 / prime
+        while (b != 0):
+            a = numpy.mod(b, prime)
+            r += (a * q)
+            q /= prime
+            b = numpy.floor(b / prime)
+        r *= (360 / nProj_per_rot)
+        k = 0
+        while (numpy.logical_and(len(seq) < numproj, k < nProj_per_rot)):
+            if modulus ==False:
+                seq.append(r + k * 360 / nProj_per_rot + 360. * (i + 1) - 720)
+            else:
+                seq.append(r + k * 360 / nProj_per_rot)
+            k += 1
+    return seq
 ########################## Interlaced #########################
+
+def reset_angles_0_360(global_PVs):
+    log_lib.info('Reset angle value between 0 & 360 deg')
+    current_angle = global_PVs['Motor_SampleRot'].get()
+    reset_angle = current_angle -360*numpy.floor(current_angle/360)
+    global_PVs['Motor_SampleRot_set'].put(1) # switch motor in "set" mode
+    global_PVs['Motor_SampleRot'].put(reset_angle) # reset rotation value between 0 and 360 deg
+    global_PVs['Motor_SampleRot_set'].put(0) # switch motor in "use" mode
+    

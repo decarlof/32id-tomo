@@ -37,8 +37,8 @@ def Condenser_In():
     global_PVs['condenser_y'].put(0) # capillary --> ?? compared to BSC
 
 def Condenser_Out():
-    global_PVs['condenser_y'].put(6)       # Capillary and High Energy BSC
-#    global_PVs['condenser_y'].put(10)       # Zeiss capillary
+#    global_PVs['condenser_y'].put(6)       # Capillary and High Energy BSC
+    global_PVs['condenser_y'].put(10.3)     # Zeiss capillary
 
 ###### Pinhole
 def Pinhole_In():
@@ -65,7 +65,7 @@ def Zone_Plate_In():
 def Zone_Plate_Out():
 ## 50 nm ZP:
     global_PVs['zone_plate_x'].put(0.0)
-    global_PVs['zone_plate_y'].put(4.6)
+    global_PVs['zone_plate_y'].put(5.1)
 # 60 nm ZP:
 #    global_PVs['zone_plate_x'].put(-7.5)
 #    global_PVs['zone_plate_y'].put(5.0)
@@ -86,6 +86,15 @@ def Diffuser_In():
 def Diffuser_Out():
     global_PVs['diffuser_x'].put(7)
 
+###### Phase ring:
+def Phase_Ring_In():
+    global_PVs['phase_ring_x'].put(0)
+    global_PVs['phase_ring_y'].put(0)
+
+def Phase_Ring_Out():
+    global_PVs['phase_ring_x'].put(0.140)
+    global_PVs['phase_ring_y'].put(-0.170)
+
 ###### CRL's:
 def crl_out():
     global_PVs['crl_actuators_0'].put(0, wait=True, timeout=1)
@@ -98,8 +107,9 @@ def crl_out():
     global_PVs['crl_actuators_7'].put(0, wait=True, timeout=1)
 
 def crl_in():
+    print('CRL tmp')
 #    global_PVs['crl_actuators_0'].put(1, wait=True, timeout=1)
-    global_PVs['crl_actuators_1'].put(1, wait=True, timeout=1)
+#    global_PVs['crl_actuators_1'].put(1, wait=True, timeout=1)
     global_PVs['crl_actuators_2'].put(1, wait=True, timeout=1)
     global_PVs['crl_actuators_3'].put(1, wait=True, timeout=1)
     global_PVs['crl_actuators_4'].put(1, wait=True, timeout=1)
@@ -142,24 +152,8 @@ def change_rot_speed():
 def All_In():
     
     crl_in()
-#    global_PVs['BPM_vert_readback'].put(-1.3) # @ 6.6 keV CRL 0,4,5
-#    global_PVs['BPM_horiz_readback'].put(5.7) # @ 6.6 keV CRL 0,4,5
-#    global_PVs['BPM_vert_readback'].put(-1.4) # @ 7.7 keV CRL 0,4,5
-#    global_PVs['BPM_horiz_readback'].put(3.8) # @ 7.7 keV CRL 0,4,5
-#    global_PVs['BPM_vert_readback'].put(-0.5) # @ 8 keV CRL 1,2,4
-#    global_PVs['BPM_horiz_readback'].put(5.8) # @ 8 keV CRL 1,2,4
-#    global_PVs['BPM_vert_readback'].put(-1.6) # @ 8.3 keV CRL 0,1,4,5
-#    global_PVs['BPM_horiz_readback'].put(3.9) # @ 8.3 keV CRL 0,1,4,5
-#    global_PVs['BPM_vert_readback'].put(-3.6) # @ 8.4 keV CRL 1,2,4
-#    global_PVs['BPM_horiz_readback'].put(4.6) # @ 8.4 keV CRL 1,2,4
-#    global_PVs['BPM_vert_readback'].put(-2.0) # @ 8.5 keV CRL 1,4,5
-#    global_PVs['BPM_horiz_readback'].put(3.5) # @ 8.5 keV CRL 1,4,5
-#    global_PVs['BPM_vert_readback'].put(-1.3) # @ 9.1 keV CRL 1,4,5
-#    global_PVs['BPM_horiz_readback'].put(3.5) # @ 9.1 keV CRL 1,4,5
-#    global_PVs['BPM_vert_readback'].put(-4.8) # @ 10.0 keV CRL 1,2,3,4,5
-#    global_PVs['BPM_horiz_readback'].put(2.8) # @ 10.0 keV CRL 1,2,3,4,5
-    global_PVs['BPM_vert_readback'].put(-2.0) # @ 11.2 keV CRL 1,2,3,4,5
-    global_PVs['BPM_horiz_readback'].put(2.8) # @ 11.2 keV CRL 1,2,3,4,5
+    global_PVs['BPM_vert_readback'].put(0.5) # @ 8.0 keV CRL 1,2,4
+    global_PVs['BPM_horiz_readback'].put(0.0) # @ 8.04 keV CRL 1,2,4
     
     Beam_Stop_In()
     Condenser_In()
@@ -188,20 +182,8 @@ def All_In():
 def All_Out():
 
     crl_out()
-#    global_PVs['BPM_vert_readback'].put(-0.7) # 6.6 keV
-#    global_PVs['BPM_horiz_readback'].put(6.4) # 6.6 keV
-#    global_PVs['BPM_vert_readback'].put(0.7) # 8 keV
-#    global_PVs['BPM_horiz_readback'].put(7.1) # 8 keV
-#    global_PVs['BPM_vert_readback'].put(-1.7) # 8.3 keV
-#    global_PVs['BPM_horiz_readback'].put(4.2) # 8.3 keV
-#    global_PVs['BPM_vert_readback'].put(-2.3) # 8.4 keV
-#    global_PVs['BPM_horiz_readback'].put(6.2) # 8.4 keV
-#    global_PVs['BPM_vert_readback'].put(0.7) # 8.5 keV
-#    global_PVs['BPM_horiz_readback'].put(5.7) # 8.5 keV
-#    global_PVs['BPM_vert_readback'].put(-0.7) # 9.1 keV
-#    global_PVs['BPM_horiz_readback'].put(4.4) # 9.1 keV
-    global_PVs['BPM_vert_readback'].put(-2.0) # 11.2 keV
-    global_PVs['BPM_horiz_readback'].put(2.8) # 11.2 keV
+    global_PVs['BPM_vert_readback'].put(0.5) # 8.0 keV
+    global_PVs['BPM_horiz_readback'].put(0.0) # 8.0 keV
 
     global_PVs['Cam1_TriggerMode'].put(0, wait=True, timeout=1)
     global_PVs['Cam1_FF_norm'].put(0, wait=True, timeout=1)

@@ -19,16 +19,41 @@ import libs.dm_lib as dm_lib
 from datetime import datetime
 
 global variableDict
+#
+#variableDict = {'PreDarkImages':1, # continuous fast scan
+#        'PreWhiteImages': 20,
+#        'Projections': 18000,
+#        'PostDarkImages': 0,
+#        'PostWhiteImages': 20,
+#        'SampleXOut': 0.2,
+#        'SampleYOut': 0.0,
+#        'SampleZOut': 0.0,
+#        'SampleRotOut': 0.0,
+#        'SampleXIn': 0.0,
+#        'SampleYIn': 0.0,
+#        'SampleZIn': 0.0,
+#        'SampleStartPos': 0.0,
+#        'SampleEndPos': 3240.0,
+#        'StartSleep_min': 0,
+#        'StabilizeSleep_ms': 0,
+#        'ExposureTime': 0.6,
+#        'ExposureTime_Flat': 0.6,
+#        'IOC_Prefix': '32idcPG3:',
+#        'FileWriteMode': 'Stream',
+#        'nLoops': 1,
+#        'CCD_Readout': 0.01,
+#        'RemoteAnalysisDir': 'usr32idc@txmtwo:/local/dataraid/'
+#        }
 
-variableDict = {'PreDarkImages': 5,
+variableDict = {'PreDarkImages':5,
         'PreWhiteImages': 10,
-        'Projections': 1210,
+        'Projections': 1500,
         'PostDarkImages': 5,
         'PostWhiteImages': 10,
-        'SampleXOut': 0.4,
+        'SampleXOut': 0.5,
         'SampleYOut': 0.0,
         'SampleZOut': 0.0,
-#       'SampleRotOut': 0.0,
+        'SampleRotOut': 0.0,
         'SampleXIn': 0.0,
         'SampleYIn': 0.0,
         'SampleZIn': 0.0,
@@ -36,15 +61,12 @@ variableDict = {'PreDarkImages': 5,
         'SampleEndPos': 180.0,
         'StartSleep_min': 0,
         'StabilizeSleep_ms': 0,
-        'ExposureTime': 0.5,
-        'ExposureTime_flat': 0.5,
-        'ShutterOpenDelay': 0.00,
+        'ExposureTime': 1.0,
+        'ExposureTime_Flat': 1.0,
         'IOC_Prefix': '32idcPG3:',
-        'ExternalShutter': 0,
         'FileWriteMode': 'Stream',
-        'UseInterferometer': 0,
         'nLoops': 1,
-        'CCD_Readout': 0.05,
+        'CCD_Readout': 0.02,
         'RemoteAnalysisDir': 'usr32idc@txmtwo:/local/dataraid/'
         }
 
@@ -79,11 +101,11 @@ def main():
 #   global_PVs['HDF1_NextFile'].put(0)
     for iLoop in range(0,nLoops):
         log_lib.info('  *** Starting fly scan %i' % (iLoop+1))
-        global_PVs['Motor_SampleRot'].put(0, wait=True, timeout=600.0)
+        global_PVs['Motor_SampleRot'].put(variableDict['SampleStartPos'], wait=True, timeout=600.0)
         scan_lib.tomo_fly_scan(variableDict, global_PVs, FileName)
         dm_lib.scp(global_PVs, variableDict)
         log_lib.info(' ')
-        log_lib.info('  *** Total scan time: %s minutes' % str((time.time() - tic)/60.))
+        log_lib.info('  *** Total scan time: %.2f minutes' % ((time.time() - tic)/60.))
         
 if __name__ == '__main__':
     main()
